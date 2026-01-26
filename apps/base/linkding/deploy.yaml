@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.28.0-standalone-strict/all.json
+
+# https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: linkding-data-pvc
+  namespace: default
+  labels:
+    app: linkding-data-pvc
+spec:
+  # AKS: default,managed-premium
+  # GKE: standard
+  # EKS: gp2 (custom)
+  # Rook: rook-ceph-block,rook-ceph-fs
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linkding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkding
+  template:
+    metadata:
+      labels:
+        app: linkding
+    spec:
+      containers:
+        - name: linkding
+          image: sissbruecker/linkding:1.39.1
+          ports:
+            - containerPort: 9090
+
+          volumeMounts:
+            - name: linkding-data
+              mountPath: /etc/linkding/data
+      volumes:
+        - name: linkding-data
+          persistentVolumeClaim:
+            claimName: linkding-data-pvc
