@@ -1,0 +1,14 @@
+# https://kubernetes.io/docs/concepts/configuration/configmap/
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linkding-configmap
+data:
+  LD_SERVER_PORT: "3003"
+  LD_SERVER_PORT: "3003"
+  LD_SERVER_PORT: "3003"
+  LD_SERVER_PORT: "3003"
+  LD_SERVER_PORT: "3003"
+  LD_SERVER_PORT: "3003"
+---
+
