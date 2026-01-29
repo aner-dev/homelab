@@ -15,3 +15,18 @@ Without inspecting with curl, I will have an storage issue in the future, becaus
 Also I learn that the `patches:` block of kustomization.yaml allows me to customize, if my redundancy is excused, that YAML manifest without changing it directly.
 Maintain it 'clean and pure', and only putting on them my specific customization. 
 
+# TIL: Inspecting Remote Manifests via Curl
+
+## 💡 The Spark
+I wasn't sure how to verify the content of a remote YAML before applying it to the cluster.
+
+## 🛠️ The Discovery
+Instead of blindly applying a URL, I can pipe it to a file or stdout:
+`curl -L <URL> > manifest.yaml`
+
+## 🧠 Key Insight
+Rancher's `local-path-provisioner` has a default `reclaimPolicy: Delete`. 
+**Warning:** This is dangerous for my homelab if I expect data persistence.
+
+## 🚀 Action Item
+Always check the `reclaimPolicy` in remote manifests and use **Kustomize Patches** to override them instead of modifying the downloaded file.
