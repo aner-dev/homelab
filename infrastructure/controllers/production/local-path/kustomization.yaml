@@ -1,0 +1,15 @@
+# infrastructure/controllers/production/local-path/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/local-path
+
+patches:
+  - target:
+      kind: StorageClass
+      name: local-path
+    patch: |-
+      - op: replace
+        path: /reclaimPolicy
+        value: Retain
