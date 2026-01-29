@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rustfs
-  namespace: storage
 spec:
   selector:
     matchLabels:
@@ -26,10 +25,33 @@ spec:
           ports:
             - containerPort: 9000
               name: rustfs
+          # SENSE 1: Startup - "Wait until I'm ready for the first time"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            failureThreshold: 10
+            periodSeconds: 5
+          # SENSE 2: Liveness - "If I freeze, kill me"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          # SENSE 3: Readiness - "If I'm busy/broken, don't send me users"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+
           volumeMounts:
             - name: rustfs-data
               mountPath: /data
-  volumeClaimTemplates: # this acts as a "Factory"; it creates new PVCs automatically for every replica I have
+
+  volumeClaimTemplates: # Factory: creates new PVCs automatically for every replica I have
     - metadata:
         name: rustfs-data
       spec:
