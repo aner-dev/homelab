@@ -1,0 +1,14 @@
+- Previously: Having `namespace: <name>` in `base/` directory of applications
+- Now: Moved `namespace: <name>` definition to `production/` directory 
+- Reasoning:
+- base/ should be a "Reusable Component." 
+- Disadvantages of hardcoding `namespace: <name>` in `base/`:
+  - Lack of Flexibility:
+    - I cannot deploy a "test" version of the same app in a different namespace (like storage-test) because the base will always force it back to storage.
+  - Kustomize Conflict:
+    - If `base/` says `namespace: storage` and the `production/kustomization.yaml` says `namespace: prod-storage`, Kustomize will try to "overwrite" it, but it can lead to confusion and errors in complex setups.
+- Advantages of Kustomization on `namespace` definition:
+  - It adds namespace: storage to the StatefulSet.
+  - It adds namespace: storage to the Service.
+  - It automatically updates the Service name in your Ingress to point to the correct namespace.
+- It acts as a *"Global Variable"* for that folder.

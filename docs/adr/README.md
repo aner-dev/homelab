@@ -1,0 +1,1 @@
+All the ADR notes within this directory will use the [Michael Nygard Template](https://github.com/joelparkerhenderson/architecture-decision-record/tree/main/locales/en/templates/decision-record-template-by-michael-nygard)

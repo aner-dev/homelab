@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Namespace # <- Cluster-Wide Object
+metadata:
+  name: database
+  labels:
+    name: database
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster # <- Custom Resource (CR)
+metadata:
+  name: linkding-storage
+  namespace: database
+spec:
+  instances: 3
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  bootstrap:
+    initdb:
+      database: linkding
+      owner: linkding_user
+      secret:
+        name: linkding-db-creds # The Operator will look for or create this
+
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://backups/linkding"
+      endpointURL: "http://rustfs.storage.svc.cluster.local:9000" # Example MinIO endpoint
+      s3Credentials:
+        accessKeyId:
+          name: rustfs-creds
+          key: ACCESS_KEY
+        secretAccessKey:
+          name: minio-creds
+          key: SECRET_KEY
+
+  storage:
+    size: 1Gi
+
+  monitoring:
+    enablePodMonitor: true
+
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: postgresql.cnpg.io/v1
+kind: SchedulerBackup
+metadata:
+  name: linkding-scheduled-backup
+  namespace: database
+spec:
+  schedule: "0 0 2 * * *" # Every day at 02:00:00 AM
+  cluster:
+    name: linkding-storage
+  backupOwnerReference: self
+  immediate: true

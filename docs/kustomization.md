@@ -1,0 +1,10 @@
+- previous file: `infrastructure/controllers/local-path/local-path-provider.yaml`
+- now changed to: `infrastructure/controllers/local-path/kustomization.yaml`
+- reasoning:
+  - instead of copy-pasting a large YAML file to get a resource, I just add their URL as the value of 'resources:' field in a `kustomization.yaml`
+  - I use that resource as a *Template*, then use kustomize to apply changes to it 
+  - .i.e converting a 'base' configuration into a production-specific one
+- advantages:
+  - avoiding adding unnecessary code & verbosity to the project
+  - leveraging kustomize and FluxCD (GitOps) workflow
+   - In less than 10 lines of code, I'm able to get the desired resource and personalize it. 
