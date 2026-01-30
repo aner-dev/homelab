@@ -1,4 +1,4 @@
-# 3. Use Kustomize Overlays for Environment Separation
+# Use Kustomize Overlays for Environment Separation
 
 ## Status
 Accepted
