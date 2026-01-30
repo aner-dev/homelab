@@ -3,5 +3,4 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./gateway-api/
-#- ./cnpg/base # This points to the next level down
-#- ./minio/base # You'll add this later!
+  - ./controllers/
