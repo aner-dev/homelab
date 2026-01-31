@@ -1,0 +1,5 @@
+[tools]
+helm = "3.16.4"
+kubectl = "1.35"
+kustomize = "5.7.0"
+opentofu = "1.11.4"
