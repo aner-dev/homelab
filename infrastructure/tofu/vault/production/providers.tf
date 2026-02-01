@@ -1,0 +1,7 @@
+provider "vault" {
+}
+
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "rancher-desktop"
+}

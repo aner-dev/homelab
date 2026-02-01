@@ -1,5 +1,8 @@
 [tools]
 helm = "3.16.4"
+jq = "1.8.1"
 kubectl = "1.35"
 kustomize = "5.7.0"
 opentofu = "1.11.4"
+vault = "1.21.2"
+yq = "4.52.2"
