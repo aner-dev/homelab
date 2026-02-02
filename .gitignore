@@ -3,3 +3,6 @@ infrastructure/controllers/external-secrets/base/charts
 vault-keys.txt
 *-keys.txt
 *.tfvars
+*.tfstate
+*.tfstate.backup
+*.tfplan
