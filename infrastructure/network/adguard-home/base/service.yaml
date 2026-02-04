@@ -1,1 +1,29 @@
-type: loadbalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: adguard-home
+  namespace: network
+  annotations:
+    # When suing MetalLB or similar, I can request a specific IP here
+    # metallb.universe.tf/loadBalancerIPs: 192.168.1.50
+spec:
+  type: LoadBalancer
+  selector:
+    app: adguard-home
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: 53
+    - name: http-ui
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: setup-ui
+      port: 3000
+      protocol: TCP
+      targetPort: 3000

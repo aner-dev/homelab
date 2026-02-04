@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# This links the 'Instance' to the 'Class'
+resources:
+  - ../base
+
+# Production-specific adjustments (The "Overrides")
+patches:
+  - target:
+      kind: Deployment
+      name: adguard-home
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1 # In production, maybe you want 2 for HA?
