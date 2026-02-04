@@ -2,7 +2,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./gateway-api/
-  - ./controllers/cloudnative-pg/base
-  - ./controllers/external-secrets/base
-  - ./storage/
+  - gateway-api # Points to gateway-api/kustomization.yaml
+  - controllers # Points to controllers/kustomization.yaml
+  - storage # oints to storage/kustomization.yaml

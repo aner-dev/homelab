@@ -43,15 +43,3 @@ resource "vault_kubernetes_auth_backend_config" "main" {
   disable_iss_validation = true
 }
 
-resource "kubernetes_config_map_v1" "vault_bridge" {
-  metadata {
-    name      = "vault-bridge-config"
-    namespace = var.eso_namespace
-  }
-
-  data = {
-    vault_url  = var.vault_url
-    vault_role = vault_kubernetes_auth_backend_role.external_secrets.role_name
-    auth_path  = vault_auth_backend.kubernetes.path
-  }
-}

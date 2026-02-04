@@ -3,6 +3,15 @@ helm = "3.16.4"
 jq = "1.8.1"
 kubectl = "1.35"
 kustomize = "5.7.0"
+openbao = "2.4.4"
 opentofu = "1.11.4"
 vault = "1.21.2"
 yq = "4.52.2"
+
+[env]
+
+# This tells Tofu/OpenBao to use the OpenBao naming conventions
+BAO_ADDR = "http://vault.vault.svc.cluster.local:8200"
+VAULT_ADDR = "http://vault.vault.svc.cluster.local:8200"
+
+TF_VAR_openbao_addr = "http://localhost:8200"

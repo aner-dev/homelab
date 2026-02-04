@@ -1,0 +1,28 @@
+# OpenBao Helm Values with Longhorn Persistence
+server:
+  # Using Raft (Integrated Storage)
+  dataStorage:
+    enabled: true
+    size: 5Gi
+    storageClass: "longhorn"
+
+  ha:
+    enabled: true
+    replicas: 1 # Start with 1 for local development
+    raft:
+      enabled: true
+      setNodeId: true
+      config: |
+        ui = true
+        listener "tcp" {
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          tls_disable = 1
+        }
+        storage "raft" {
+          path = "/vault/data"
+        }
+# disable the injector because I'm using External Secrets Operator (ESO)
+# ESO is more decoupled than the Vault Sidecar Injector.
+injector:
+  enabled: false

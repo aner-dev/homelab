@@ -1,4 +1,5 @@
 provider "vault" {
+  adress = var.openbao_url
 }
 
 provider "kubernetes" {

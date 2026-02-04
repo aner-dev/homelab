@@ -3,8 +3,8 @@ variable "eso_namespace" {
   type        = string
   default     = "external-secrets"
 }
-variable "vault_url" {
+variable "openbao_addr" {
   type        = string
-  description = "The internal network URL of the Vault service"
-  default     = "http://vault.vault.svc.cluster.local:8200"
+  description = "The internal network URL of the OpenBao service"
+  default     = "http://openbao.openbao.svc.cluster.local:8200"
 }
