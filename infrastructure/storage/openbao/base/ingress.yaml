@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: openbao-web
+  namespace: openbao
+spec:
+  entryPoints:
+    - websecure # This is port 443 in Traefik
+  routes:
+    # THIS IS THE DISTINGUISHER
+    - match: Host(`bao.homelab.local`)
+      kind: Rule
+      services:
+        - name: openbao
+          port: 8200

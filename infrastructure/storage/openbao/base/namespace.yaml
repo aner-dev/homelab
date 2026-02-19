@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openbao
+  labels:
+    # This label is a common convention for grouping infrastructure apps
+    app.kubernetes.io/part-of: infrastructure
+    # If I ever use a Service Mesh (like Linkerd or Istio)labels goes here
+    # istio-injection: enabled

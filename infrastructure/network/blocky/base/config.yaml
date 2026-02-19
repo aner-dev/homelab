@@ -1,0 +1,69 @@
+# =========================================================
+# LAYER 1: EXTERNAL INTERNET (The Privacy Gateway)
+# Handles all public traffic via DoH with FOSS-first failover.
+# =========================================================
+upstreams:
+  init:
+    strategy: fast
+  timeout: 3s
+  userAgent: "Gemini-Homelab-Blocky/1.0"
+  strategy: strict
+
+  groups:
+    default:
+      - https://doh.libredns.gr/dns-query
+      - https://dns.mullvad.net/dns-query
+      - https://cloudflare-dns.com/dns-query
+      - https://dns.google/dns-query
+
+# BOOTSTRAP: Solves the "Chicken & Egg" loop for DoH.
+bootstrapDns:
+  - https://1.1.1.1/dns-query
+  - 8.8.8.8
+
+# =========================================================
+# LAYER 2: INTERNAL K8S (The Cluster Hub)
+# Bridges the gap between Blocky and K8s Service Discovery.
+# =========================================================
+conditional:
+  mapping:
+    cluster.local: 10.96.0.10 # Standard CoreDNS IP
+
+# =========================================================
+# LAYER 3: LOCAL HOMELAB (The Spoke Map)
+# Resolves internal human-friendly names to physical Node IPs.
+# =========================================================
+customDNS:
+  customTTL: 1h
+  mapping:
+    vault.homelab: 192.168.1.50
+    gateway.homelab: 192.168.1.1
+
+# =========================================================
+# GLOBAL POLICIES (Security & Observability)
+# =========================================================
+blocking:
+  blackLists:
+    ads:
+      - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+  clientGroupsBlock:
+    default:
+      - ads
+  blockTTL: 1m
+
+caching:
+  minTime: 5m
+  maxTime: 30m
+  prefetching: true
+
+prometheus:
+  enable: true
+  path: /metrics
+
+ports:
+  dns: 53
+  http: 4000
+
+log:
+  level: info
+  format: text
