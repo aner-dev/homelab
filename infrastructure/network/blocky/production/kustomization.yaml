@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../base
+
+namespace: network
+
+images:
+  - name: blocky
+    newName: ghcr.io/0xerr0r/blocky
+    newTag: v0.28.2
+
+configMapGenerator:
+  - name: blocky-config
+    behavior: replace
+    files:
+      - config.yaml=config.yaml
