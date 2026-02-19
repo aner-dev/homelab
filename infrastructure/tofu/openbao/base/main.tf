@@ -1,45 +1,62 @@
-# 1. Enable the KV (Key-Value) Secret Engine version 2
-# This creates the "Folders" where your passwords will live.
+# auto-unseal is "PRE-API" logic; the Factory is "POST-API"" logic 
+# --- 1. CORE CONFIGURATION (Global Handshake & auto-unseal) ---
 resource "vault_mount" "kvv2" {
   path        = "secret"
   type        = "kv"
+  options     = { version = "2" }
   description = "Main secret storage for applications"
 }
 
-# 2. Define the Policy
-# This is the "Rulebook" that says: "You can only read secrets."
-resource "vault_policy" "external_secrets" {
-  name   = "external-secrets-policy"
-  policy = <<EOT
-path "${vault_mount.kvv2.path}/data/*" {
-  capabilities = ["read"]
-}
-EOT
-}
-
-# 3. Enable Kubernetes Auth Method
-# This tells Vault: "Trust my Kubernetes cluster to verify identities."
 resource "vault_auth_backend" "kubernetes" {
   type = "kubernetes"
   path = "kubernetes"
 }
 
-# 4. Create the Role (The Bridge)
-# This connects a specific K8s ServiceAccount to the Policy.
-resource "vault_kubernetes_auth_backend_role" "external_secrets" {
-  backend                          = vault_auth_backend.kubernetes.path
-  role_name                        = "external-secrets-role"
-  bound_service_account_names      = ["external-secrets"]
-  bound_service_account_namespaces = [var.eso_namespace]
-  token_policies                   = [vault_policy.external_secrets.name]
-  token_ttl                        = 3600
-}
-
-# 5. Configure the Backend (The System Handshake)
-# This allows Vault to verify the ServiceAccount tokens with the K8s API.
 resource "vault_kubernetes_auth_backend_config" "main" {
   backend                = vault_auth_backend.kubernetes.path
   kubernetes_host        = "https://kubernetes.default.svc"
   disable_iss_validation = true
+}
+
+# --- 2. THE APP FACTORY LOGIC ---
+locals {
+  # The 'locals' now only handles DATA TRANSFORMATION, not data definition.
+  apps = var.apps_config
+
+  app_list = flatten([
+    for name, cfg in local.apps : [
+      for env in cfg.envs : {
+        id   = env == "base" ? name : "${name}-${env}"
+        name = name
+        ns   = cfg.ns
+        path = "apps/${name}/${env}" # Path pattern: apps/blocky/production
+      }
+    ]
+  ])
+
+  app_map = { for item in local.app_list : item.id => item }
+}
+
+# --- 3. DYNAMIC RESOURCE GENERATION ---
+resource "vault_policy" "app_policies" {
+  for_each = local.app_map
+
+  name   = "${each.key}-policy"
+  policy = <<EOT
+path "${vault_mount.kvv2.path}/data/${each.value.path}/*" {
+  capabilities = ["read"]
+}
+EOT
+}
+
+resource "vault_kubernetes_auth_backend_role" "app_roles" {
+  for_each = local.app_map
+
+  backend                          = vault_auth_backend.kubernetes.path
+  role_name                        = "${each.key}-role"
+  bound_service_account_names      = ["${each.value.name}-sa"]
+  bound_service_account_namespaces = [each.value.ns]
+  token_policies                   = [vault_policy.app_policies[each.key].name]
+  token_ttl                        = 3600
 }
 
