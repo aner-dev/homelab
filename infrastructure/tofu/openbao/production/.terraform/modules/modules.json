@@ -1,1 +1,1 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"vault_config","Source":"../base","Dir":"../base"}]}
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"vault_config","Source":"../base","Dir":"../base"},{"Key":"vault_permissions","Source":"../base","Dir":"../base"}]}
