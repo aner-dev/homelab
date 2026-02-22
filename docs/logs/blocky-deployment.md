@@ -51,6 +51,58 @@ Problem: If you update the ConfigMap in the API, the file inside the Pod never u
 
 Directory Mount (the better option): Mounts the whole folder.
 Benefit: Kubernetes can "Hot Reload" the file. When you change your DNS rules, Blocky sees the update in seconds without dropping a single packet.
+# Why a DNS applications needs a volume logic? If it's nature is to be a stateless 
+- ConfigMap
+- In order to deliver all the configuration manifest across all the containers within all the pods, I've decided to implement a `ConfigMap`
+- I've encountered with the need to create a `volumeMounts` in order to have a reliable 'delivery' of my configuration specification/manifest. 
+## avoiding use `subPath` 
+- **symlink rotation** executed by k8s, specifically by the **kubelet** 
+  - based in directories, subPath because its nature of being a file 
+- because I'm not using another file within `/app/config`, mounting the whole directory will the optimal option to implement. 
+### subPath trade-offs
+- sacrify that **hot reload capability** 
+- 
+
+
+# Log Entry: Refactoring Vault Role Naming Convention
+Context & Implementation
+During the initial setup of the Blocky secret pipeline, I identified a significant naming mismatch between the Tofu-provisioned Vault roles and the Kubernetes ServiceAccounts.
+Initially, the logic relied on complex string interpolation that appended environment suffixes (e.g., -production, -staging) to the Role IDs.
+# Problem detection & reasoning
+I concluded this approach was over-engineered and fragile; it forced unnecessary changes in the Kustomize overlays and broke the "Build Once, Deploy Anywhere" principle.
+# Fix & implementation
+To resolve this, I decoupled the App Identity from its environment context.
+I refactored the base/main.tf logic to a 1:1 mapping (App Name = Role Name), ensuring that blocky always authenticates as blocky-role regardless of the cluster, while using metadata-driven policies to handle environment-specific secret paths.
+
+# future improvements in tofu / infrastructure as code 
+Variable DRYness & Orchestration
+
+Current State: Utilizing terraform.tfvars within environment overlays (production/, staging/). This requires a "pass-through" variable declaration in the overlay's variables.tf, creating minor boilerplate redundancy.
+## The Role of .tfvars as SSOT (Source of Truth):
+In the current architecture, the .tfvars file acts as the Single Source of Truth (SSOT) for all application-specific metadata. By centralizing values—such as namespaces (ns) and target environments (envs)—within this data-only file, we decouple "The Logic" (how a Vault role is built) from "The Data" (which apps need roles). This ensures that adding a new service to the homelab only requires a single-line entry in the .tfvars map, rather than a modification of the underlying Tofu logic.
+## future tech stack
+Target State: Implement Terragrunt or FluxCD Post-Build Substitution.
+
+Objective: Achieve a "DRY" (Don't Repeat Yourself) architecture where the apps_config schema is defined once in base/ and values are inherited/merged automatically, eliminating the need for redundant variable declarations in overlays.
+
+# issue: Circular Dependency & Infrastructure Deadlock: Flux & Blocky DNS Loop 
+
+During the initial bootstrapping of our cluster's network infrastructure, I encountered a classic "chicken-and-egg" circular dependency between our GitOps controller (FluxCD) and our custom DNS provider (Blocky). 
+
+Because our cluster relies on Blocky to resolve external domains and enforce network policies, the internal CoreDNS was intended to forward upstream requests to it. However, Blocky's deployment manifests and configurations are managed via Infrastructure as Code (IaC) and stored in our Git repository on Codeberg. 
+
+
+
+This created a perfect deadlock:
+* **Flux** could not resolve `codeberg.org` to fetch the Blocky manifests because the upstream DNS resolver (Blocky) wasn't deployed yet.
+* **Blocky** couldn't be deployed because Flux couldn't reach the repository to apply its manifests.
+
+Breaking this loop required an imperative, "break-glass" intervention. By manually editing the live `coredns` ConfigMap in the `kube-system` namespace to temporarily point to a public DNS provider (like `1.1.1.1`), I provided Flux with the necessary external resolution to clone the repository. Once Flux fetched the `feat/blocky-dns` branch, it could finally deploy Blocky, allowing us to eventually revert CoreDNS to use Blocky as the permanent, declarative upstream. 
+
+
+
+
+
 
 
 
