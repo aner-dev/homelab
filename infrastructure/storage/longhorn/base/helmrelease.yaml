@@ -4,21 +4,28 @@ metadata:
   name: longhorn
   namespace: longhorn-system
 spec:
+  releaseName: longhorn
   interval: 1h
   driftDetection:
     mode: enabled
   chart:
     spec:
       chart: longhorn
-      version: "1.7.2"
+      version: "1.11.0"
       sourceRef:
         kind: HelmRepository
         name: longhorn
-        namespace: longhorn-system
+        namespace: flux-system
   install:
     createNamespace: true
   values:
     defaultSettings:
       defaultReplicaCount: 1
+      # Resource Constraints: `storageMinimalAvailablePercentage: 15`
+      # Since I have 1TB, Longhorn might refuse to schedule if it thinks the disk is too full.
+      storageMinimalAvailablePercentage: 15
+      replicaAutoBalance: "best-effort"
     persistence:
       defaultClass: true
+    metrics:
+      enabled: true
