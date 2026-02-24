@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blocky
-  namespace: blocky
 spec:
   replicas: 1
   selector:
@@ -19,12 +18,15 @@ spec:
         fsGroup: 1000
 
       serviceAccountName: blocky-sa
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true # changed from 'false': ESO requires the ServiceAccount token to authenticate with OpenBao (Vault)
 
       containers:
         - name: blocky
           image: blocky # placeholder for production/kustomization.yaml
           args: ["--config", "/app/config/config.yaml"]
+          envFrom:
+            - secretRef:
+                name: blocky-env-secrets
           ports:
             - containerPort: 53
               name: dns-udp

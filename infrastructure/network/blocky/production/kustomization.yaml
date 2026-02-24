@@ -5,9 +5,11 @@ resources:
   - ../base
   - external-secret.yaml
 
-commonLabels:
-  environment: production
-  secret-access/vault: "true"
+labels:
+  - pairs:
+      environment: production
+      secret-access/vault: "true"
+    includeSelectors: false # Optional: Keeps Kustomize from breaking the existing Deployment selectors
 
 patches:
   - target:
@@ -22,9 +24,3 @@ images:
   - name: blocky
     newName: ghcr.io/0xerr0r/blocky
     newTag: v0.28.2
-
-configMapGenerator:
-  - name: blocky-config
-    behavior: replace
-    files:
-      - config.yaml=config.yaml

@@ -5,11 +5,18 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
+  - service-account.yaml
+
+configMapGenerator:
+  - name: blocky-config
+    files:
+      - config.yaml
 
 generatorOptions:
   disableNameSuffixHash: false
 
 # Apply common metadata
-commonLabels:
-  app.kubernetes.io/name: blocky
-  app.kubernetes.io/part-of: homelab-infrastructure
+labels:
+  - pairs:
+      app.kubernetes.io/name: blocky
+      app.kubernetes.io/part-of: homelab-infrastructure
