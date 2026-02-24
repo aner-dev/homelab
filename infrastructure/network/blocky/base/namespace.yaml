@@ -1,12 +1,16 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: blocky-namespace # placeholder
+  name: blocky # placeholder
   labels:
-    # Infrastructure Tiers
+    secret-access/vault: true # ClusterSecretStore key
+    # Infrastructure Tiers: they're excelent for "Group By" logic in monitoring dashboards (grafana)
     tier: infrastructure
     component: dns
-    # Security/Governance Labels (The "Senior" addition)
+    app.kubernetes.io/name: blocky
+    app.kubernetes.io/managed-by: flux
+
+    # Security/Governance Labels (PSA)
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/enforce-version: latest
 
@@ -14,5 +18,3 @@ metadata:
     # Documentation & Ownership
     home.lab/owner: "aner"
     home.lab/description: "Primary DNS resolution for the homelab"
-    # Automation (Example: Goldilocks or VPA)
-    goldilocks.cloud.google.com/check: "true"

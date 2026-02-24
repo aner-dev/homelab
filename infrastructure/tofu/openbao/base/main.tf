@@ -23,18 +23,14 @@ locals {
   # The 'locals' now only handles DATA TRANSFORMATION, not data definition.
   apps = var.apps_config
 
-  app_list = flatten([
-    for name, cfg in local.apps : [
-      for env in cfg.envs : {
-        id   = env == "base" ? name : "${name}-${env}"
-        name = name
-        ns   = cfg.ns
-        path = "apps/${name}/${env}" # Path pattern: apps/blocky/production
-      }
-    ]
-  ])
-
-  app_map = { for item in local.app_list : item.id => item }
+  app_map = { for name, cfg in local.apps : name => {
+    name = name
+    ns   = cfg.ns
+    # We keep the environment list just for the POLICY path logic, 
+    # not for the NAME of the role.
+    envs = cfg.envs
+    }
+  }
 }
 
 # --- 3. DYNAMIC RESOURCE GENERATION ---
@@ -43,9 +39,11 @@ resource "vault_policy" "app_policies" {
 
   name   = "${each.key}-policy"
   policy = <<EOT
-path "${vault_mount.kvv2.path}/data/${each.value.path}/*" {
+%{for env in each.value.envs~}
+path "${vault_mount.kvv2.path}/data/apps/${each.key}/${env}/*" {
   capabilities = ["read"]
 }
+%{endfor~}
 EOT
 }
 
@@ -54,7 +52,7 @@ resource "vault_kubernetes_auth_backend_role" "app_roles" {
 
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "${each.key}-role"
-  bound_service_account_names      = ["${each.value.name}-sa"]
+  bound_service_account_names      = [each.key]
   bound_service_account_namespaces = [each.value.ns]
   token_policies                   = [vault_policy.app_policies[each.key].name]
   token_ttl                        = 3600

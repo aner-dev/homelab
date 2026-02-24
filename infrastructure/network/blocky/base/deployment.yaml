@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blocky
-  namespace: network
+  namespace: blocky
 spec:
   replicas: 1
   selector:
@@ -17,6 +17,9 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000 # A standard non-privileged user
         fsGroup: 1000
+
+      serviceAccountName: blocky-sa
+      automountServiceAccountToken: false
 
       containers:
         - name: blocky

@@ -2,6 +2,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - sources/
+  - controllers/
+  - storage/longhorn/production
   - gateway-api # Points to gateway-api/kustomization.yaml
   - controllers # Points to controllers/kustomization.yaml
-  - storage # oints to storage/kustomization.yaml
+  - storage # Points to storage/kustomization.yaml

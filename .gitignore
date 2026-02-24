@@ -6,3 +6,4 @@ vault-keys.txt
 *.tfstate
 *.tfstate.backup
 *.tfplan
+docs/prompts.md
