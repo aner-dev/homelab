@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - secretstore.yaml
+  - service-account.yaml
+
 helmCharts:
   - name: external-secrets
     releaseName: external-secrets
@@ -12,3 +13,8 @@ helmCharts:
     namespace: external-secrets
     valuesInline:
       installCRDs: true
+      serviceAccount:
+        create: false # Don't let Helm create it
+        name: "external-secrets"
+      rbac:
+        create: true

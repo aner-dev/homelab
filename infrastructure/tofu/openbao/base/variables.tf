@@ -9,7 +9,7 @@ variable "apps_config" {
   default = {
     "external-secrets" = {
       ns   = "external-secrets",
-      envs = ["base"]
+      envs = ["production"]
     }
   }
 }

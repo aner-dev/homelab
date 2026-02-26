@@ -7,7 +7,6 @@ spec:
   entryPoints:
     - websecure # This is port 443 in Traefik
   routes:
-    # THIS IS THE DISTINGUISHER
     - match: Host(`bao.homelab.local`)
       kind: Rule
       services:
