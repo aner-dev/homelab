@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-secrets
+  labels:
+    name: external-secrets
+    app.kubernetes.io/instance: external-secrets
+    app.kubernetes.io/part-of: homelab-infrastructure
+
+    # 2. Pod Security Admission (PSA) - Crucial for modern clusters
+    # tells K8s what security level to enforce on pods in this namespace.
+    # ESO usually needs 'privileged' or 'baseline' depending on the config.
+    pod-security.kubernetes.io/enforce: baseline
+
+    # 3. Governance/Automation Labels
+    # For example, if I use a specific backup tool or network policy engine
+    # rustfs/garage deployment
+    homelab/backup: "false"

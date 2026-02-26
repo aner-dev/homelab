@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: smoke-test-pvc
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: storage-checker
+  namespace: default
+spec:
+  containers:
+    - name: alpine
+      image: alpine
+      command:
+        ["sh", "-c", "while true; do date >> /mnt/data/test.log; sleep 5; done"]
+      volumeMounts:
+        - name: data
+          mountPath: /mnt/data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: smoke-test-pvc

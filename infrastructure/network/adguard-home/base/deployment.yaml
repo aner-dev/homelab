@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adguard-home
+  namespace: network
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adguard-home
+  template:
+    metadata:
+      labels:
+        app: adguard-home
+    spec:
+      containers:
+        - name: adguard-home
+          image: adguard/adguardhome:v0.107.52@sha256:9d0282c10673117d6ae2312ad48379a259b7bdb3e4931470a4b383c839a3eabf
+          ports:
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: http-ui
+              containerPort: 80
+              protocol: TCP
+            - name: setup-ui
+              containerPort: 3000
+              protocol: TCP
+          securityContext:
+            # plumbing
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+            runAsNonRoot: false # AdGuard binary needs to start as root to drop privileges itself
+            runAsUser: 0
+          volumeMounts:
+            - name: adguard-data
+              mountPath: /opt/adguardhome/work
+            - name: adguard-config
+              mountPath: /opt/adguardhome/conf
+      volumes:
+        - name: adguard-data
+          persistentVolumeClaim:
+            claimName: adguard-data-pvc
+        - name: adguard-config
+          persistentVolumeClaim:
+            claimName: adguard-config-pvc
