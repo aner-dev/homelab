@@ -3,15 +3,8 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - helm-chart.yaml
-
-helmCharts:
-  - name: cilium
-    releaseName: cilium
-    version: 1.19.1
-    repo: https://helm.cilium.io/
-    valuesFile: helm-values.yaml
-    includeCRDs: true
+  - helm-repo.yaml
+  - helm-release.yaml
 
 # This ensures all Cilium resources are labeled for IaC tracking
 labels:
