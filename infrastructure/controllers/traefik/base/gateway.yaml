@@ -1,0 +1,33 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: main-gateway
+  namespace: traefik
+  labels:
+    app.kubernetes.io/name: main-gateway
+    app.kubernetes.io/instance: traefik-production
+    app.kubernetes.io/component: networking-entrypoint
+    app.kubernetes.io/managed-by: flux
+  annotations:
+    #This annotation tells Cilium to assign an IP
+    # from my specific home network pool.
+    io.cilium/lb-ipam-ips: 192.168.1.50
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: websecure
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: homelab-wildcard-cert # This will be managed by ESO later

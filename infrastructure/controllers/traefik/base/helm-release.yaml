@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: traefik
+spec:
+  releaseName: traefik
+  interval: 1h
+  timeout: 5m
+  chart:
+    spec:
+      chart: traefik
+      version: "39.0.*"
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+      interval: 5m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true # Forces a fix on the next attempt
+    cleanupOnFail: true # Removes orphaned resources from failed installs
+  driftDetection:
+    mode: enabled
+  values:
+    providers:
+      kubernetesGateway:
+        enabled: true
+    gateway:
+      listeners:
+        web:
+          port: 80
+          protocol: HTTP
+          namespacePolicy:
+            from: All

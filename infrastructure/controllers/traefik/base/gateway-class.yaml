@@ -1,0 +1,9 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: traefik
+  # Production tip: Add a description to help teammates
+  annotations:
+    description: "Default GatewayClass for Traefik-managed infrastructure"
+spec:
+  controllerName: traefik.io/gateway-controller

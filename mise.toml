@@ -7,6 +7,7 @@ openbao = "2.4.4"
 opentofu = "1.11.4"
 vault = "1.21.2"
 yq = "4.52.2"
+"aqua:cilium/cilium-cli" = "0.19.2"
 
 [env]
 
