@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: traefik-gateway
+  namespace: traefik
+  annotations:
+    # This annotation tells Cilium to assign an IP
+    # from my specific home network pool.
+    io.cilium/lb-ipam-ips: "192.168.1.192"
+
+    labels:
+    io.cilium/l2-announcer: "true"
+    app.kubernetes.io/instance: traefik-production
+    app.kubernetes.io/component: networking-entrypoint
+    app.kubernetes.io/managed-by: flux

@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumLoadBalancerIPPool
 metadata:
-  name: "homelab-pool"
+  name: "default-lan-pool"
   namespace: cilium
 spec:
   blocks:
