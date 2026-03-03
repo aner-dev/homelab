@@ -23,3 +23,17 @@ spec:
   values:
     installCRDs: true
     replicaCount: 1 # Production usually uses 3
+    extraArgs:
+      - --enable-gateway-api
+
+    # Enabling specific Feature Gates
+    featureGates: "AdditionalCertificateOutputFormats=true,ServerSideApply=true"
+
+    # Resource management
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
