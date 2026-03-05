@@ -10,16 +10,29 @@ spec:
     email: your-email@domain.com
     privateKeySecretRef:
       name: letsencrypt-production-account-key
+    profile: classic
     solvers:
-      solvers:
-        - dns01:
-            webhook:
-              groupName: acme.desec.io
-              solverName: desec
-              config:
-                apiTokenSecretRef:
-                  name: desec-api-token # Defined later in the deSEC logic
-                  key: api-token
+      - selector:
+        dnsNames:
+          - "*.yourdomain.com"
+          - "yourdomain.com"
+        dns01:
+          webhook:
+            groupName: acme.desec.io
+            solverName: desec
+            config:
+              apiTokenSecretRef:
+                name: desec-api-token
+                key: api-token
+      # FALLBACK/GENERIC: HTTP-01 for everything else
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: traefik-gateway
+                namespace: traefik
+                kind: Gateway
+            serviceType: ClusterIP
+
 ---
 # THE INTERNAL DOOR (Vault/OpenBao)
 apiVersion: cert-manager.io/v1

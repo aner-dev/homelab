@@ -21,6 +21,9 @@ spec:
     remediation:
       retries: 3
   values:
+    # --- Policy Logic  ---
+    policyDenyResponse: "icmp" # communication feedback loop logic
+    policyEnforcementMode: "default"
     # --- K3s / eBPF Core Logic ---
     k8sServiceHost: 127.0.0.1
     k8sServicePort: 6443

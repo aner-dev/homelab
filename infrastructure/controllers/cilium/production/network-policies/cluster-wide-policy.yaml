@@ -1,0 +1,32 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "global-zero-trust-baseline"
+spec:
+  description: "Enforces a default-deny ingress/egress posture while permitting core cluster infrastructure communications."
+  endpointSelector: {}
+
+  ingress:
+    - {}
+
+  egress:
+    # deny everything as default
+    - {}
+
+    # the whitelist
+    # everything after this dash is an exception to the default rule above
+    - toServices:
+        - k8sService:
+            extraDestinations:
+              - namespace: kube-system
+                name: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+
+    - toEntities:
+        - kube-apiserver
