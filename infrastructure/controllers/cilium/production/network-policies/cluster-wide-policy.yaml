@@ -7,26 +7,28 @@ spec:
   endpointSelector: {}
 
   ingress:
-    - {}
-
+    # Keep the global ingress empty to allow pods to receive internal traffic,
+    # then restrict it in the individual app policies.
   egress:
-    # deny everything as default
-    - {}
+    - toEntities:
+        - kube-apiserver
+        - dns
 
-    # the whitelist
-    # everything after this dash is an exception to the default rule above
     - toServices:
         - k8sService:
-            extraDestinations:
-              - namespace: kube-system
-                name: kube-dns
+            serviceName: blocky
+            namespace: blocky
       toPorts:
         - ports:
             - port: "53"
-              protocol: ANY
-          rules:
-            dns:
-              - matchPattern: "*"
-
-    - toEntities:
-        - kube-apiserver
+              protocol: UDP # DNS is almost exclusively UDP
+    - toServices:
+        - k8sService:
+            serviceName: traefik
+            namespace: traefik
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

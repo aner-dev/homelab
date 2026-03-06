@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: cilium-controller # This ensures CRDs are ready first
+    - name: cilium-base
   interval: 1h
   path: "./infrastructure/controllers/cilium/production" # Points to Pools/Policies
   prune: true

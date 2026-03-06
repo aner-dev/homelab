@@ -21,13 +21,13 @@ spec:
     remediation:
       retries: 3
   values:
+    # --- install CRDs ---
+    crd:
+      enabled: true
     # --- Policy Logic  ---
+    kubeProxyReplacement: true
     policyDenyResponse: "icmp" # communication feedback loop logic
     policyEnforcementMode: "default"
-    # --- K3s / eBPF Core Logic ---
-    k8sServiceHost: 127.0.0.1
-    k8sServicePort: 6443
-    kubeProxyReplacement: true
 
     # --- IPAM / Networking ---
     ipam:
@@ -47,8 +47,10 @@ spec:
 
     # --- Performance Tuning ---
     k8sClientRateLimit:
-      qps: 20
-      burst: 40
+      qps: 20 # queries per second
+      burst: 40 # Burst: maximum number of requests allowed in a sudden spike
+    # `k8sClientRateLimit` controls how many requests the Cilium Agent
+    # is allowed to make to the Kubernetes API Server per second.
 
     # --- Operator Config ---
     operator:
