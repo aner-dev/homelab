@@ -1,0 +1,8 @@
+# infrastructure/crds/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - cert-manager/ # Will contain rendered CRDs
+  - cilium/ # Will contain rendered CRDs
+  - longhorn/ # Will contain rendered CRDs
+  - gateway/

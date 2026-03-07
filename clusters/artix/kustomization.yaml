@@ -1,15 +1,10 @@
-apiVersion: kustomize.toolkit.fluxcd.io/v1
+apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-metadata:
-  name: cluster-base
-  namespace: flux-system
-spec:
-  interval: 1h
-  path: ./infrastructure
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  dependsOn:
-    - name: crd-layer
+resources:
+  - flux-system/
+  # reference the Flux Kustomization objects defined in this folder
+  - 01-crds.yaml
+  - 02-controllers.yaml
+  - 03-secrets.yaml
+  - 04-applications.yaml
+  - 05-ingress.yaml
