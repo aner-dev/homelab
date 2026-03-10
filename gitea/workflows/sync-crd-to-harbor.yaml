@@ -1,0 +1,36 @@
+name: Sync Cilium CRDs to Harbor
+on:
+  push:
+    paths:
+      - "infrastructure/crds/cilium/manifests/**" # Only trigger if CRDs change
+    branches:
+      - main
+
+jobs:
+  package-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate YAML
+        run: |
+          # Use kubeconform to ensure the files are valid K8s resources
+          # You might need to install it in your runner image
+          docker run --rm -v $(pwd):/work -w /work ghcr.io/yannh/kubeconform:latest \
+            -summary infrastructure/crds/cilium/manifests/
+
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: harbor.local # Change to your Harbor URL
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Push OCI Artifact
+        run: |
+          # Use flux to push the directory as an OCI artifact
+          # This creates an immutable versioned reference for Flux
+          flux push artifact oci://harbor.local/homelab/cilium-crds:${{ github.sha }} \
+            --path="./infrastructure/crds/cilium/manifests/" \
+            --source="${{ github.server_url }}/${{ github.repository }}" \
+            --revision="${{ github.sha }}"

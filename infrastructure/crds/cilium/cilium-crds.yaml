@@ -1,0 +1,13 @@
+# infrastructure/crds/cilium-crds.yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cilium-crds
+  namespace: flux-system
+spec:
+  interval: 1h
+  path: ./manifests # The folder inside the repo/OCI artifact
+  prune: true
+  sourceRef:
+    kind: GitRepository # Switch to OCIRepository when ready (harbor deployment)
+    name: cilium-crds-git
