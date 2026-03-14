@@ -1,0 +1,5 @@
+# .fdignore
+charts/
+*.tfstate
+*.tfstate.backup
+manifests/

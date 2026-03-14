@@ -1,0 +1,31 @@
+applications:
+  cilium:
+    repo: "https://github.com/cilium/cilium"
+    version: "v1.19.1"
+    source_path: "pkg/k8s/apis/cilium.io/client/crds/v2"
+    target_dir: "infrastructure/crds/cilium/manifests"
+  longhorn:
+    repo: "https://github.com/longhorn/longhorn"
+    version: "v1.11.0"
+    source_path: "deploy/crds"
+    target_dir: "infrastructure/crds/longhorn"
+  external-secrets:
+    repo: "https://github.com/external-secrets/external-secrets"
+    version: "v2.10"
+    source_path: "deploy/crds/bundle.yaml"
+    target_dir: "infrastructure/crds/external-secrets"
+  cloud-native-pg:
+    repo: "https://github.com/cloudnative-pg/cloudnative-pg"
+    version: "v1.28.1"
+    source_path: "config/crd"
+    target_dir: "infrastructure/crds/cloudnative-pg"
+  traefik:
+    repo: "https://github.com/traefik/traefik"
+    version: "v3.6.10"
+    source_path: "pkg/provider/kubernetes/crd"
+    target_dir: "infrastructure/crds/traefik"
+  cert-manager:
+    repo: "https://github.com/cert-manager/cert-manager"
+    version: "v1.20.0"
+    source_path: "deploy/crds"
+    target_dir: "infrastructure/crds/cert-manager/manifests"

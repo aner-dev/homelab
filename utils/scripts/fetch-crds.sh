@@ -1,37 +1,45 @@
 #!/bin/bash
 set -euo pipefail
 
-# 1. Setup a safe workspace
-REPO_URL="https://github.com/cilium/cilium"
-VERSION="v1.19.1"
-WORK_DIR=$(mktemp -d)
-TARGET_DIR="./infrastructure/crds/cilium/manifests"
+MANIFEST="infrastructure/crds/versions.yaml"
 
-# Ensure cleanup even if the script fails
-trap 'rm -rf "$WORK_DIR"' EXIT
-
-echo "Cloning $REPO_URL at $VERSION..."
-git clone --depth 1 --branch "$VERSION" "$REPO_URL" "$WORK_DIR"
-
-# 2. Senior Discovery: Instead of just 'fd', we target the known API paths
-# but use 'find' to grab all .yaml files in those specific structural locations.
-echo "Locating CRDs..."
-# This finds the directory you identified earlier
-SOURCE_PATH=$(find "$WORK_DIR" -type d -path "*/pkg/k8s/apis/cilium.io/client/crds/v2" | head -n 1)
-
-if [ -n "$SOURCE_PATH" ]; then
-  mkdir -p "$TARGET_DIR"
-  cp "$SOURCE_PATH"/*.yaml "$TARGET_DIR/"
-  # This counts only files in the target directory safely
-  CRD_COUNT=$(find "$TARGET_DIR" -maxdepth 1 -type f -name "*.yaml" | wc -l)
-  echo "Success: Moved $CRD_COUNT CRDs."
-else
-  echo "Error: Could not locate CRD directory!"
+if ! command -v yq &>/dev/null; then
+  echo "Error: yq is not installed."
   exit 1
 fi
 
-echo "------------------------------------------------"
-echo "Mission accomplished!"
-echo "CRDs successfully synchronized to: $TARGET_DIR"
-echo "Verify them with: ls -1 $TARGET_DIR"
-echo "------------------------------------------------"
+for app in $(yq eval '.applications | keys | .[]' "$MANIFEST"); do
+  REPO=$(yq eval ".applications.$app.repo" "$MANIFEST")
+  VER=$(yq eval ".applications.$app.version" "$MANIFEST")
+  SRC_PATH=$(yq eval ".applications.$app.source_path" "$MANIFEST")
+  DST_DIR=$(yq eval ".applications.$app.target_dir" "$MANIFEST")
+
+  echo "--- Processing $app ($VER) ---"
+
+  # 1. Skip if already synced
+  if [ -f "$DST_DIR/.version" ] && [ "$(cat "$DST_DIR/.version")" == "$VER" ]; then
+    echo "$app is already at version $VER. Skipping."
+    continue
+  fi
+
+  # 2. Setup environment
+  WORK_DIR=$(mktemp -d)
+  trap 'rm -rf "$WORK_DIR"' EXIT
+  git clone --depth 1 --branch "$VER" "$REPO" "$WORK_DIR" >/dev/null 2>&1
+
+  CLONE_PATH="$WORK_DIR/$SRC_PATH"
+  mkdir -p "$DST_DIR"
+
+  # 3. Centralized Copy Logic
+  if [ -d "$CLONE_PATH" ]; then
+    cp "$CLONE_PATH"/*.yaml "$DST_DIR/"
+  elif [ -f "$CLONE_PATH" ]; then
+    cp "$CLONE_PATH" "$DST_DIR/$(basename "$CLONE_PATH")"
+  else
+    echo "Error: $CLONE_PATH does not exist!"
+    exit 1
+  fi
+
+  echo "$VER" >"$DST_DIR/.version"
+  echo "Successfully updated $app CRDs in $DST_DIR"
+done
