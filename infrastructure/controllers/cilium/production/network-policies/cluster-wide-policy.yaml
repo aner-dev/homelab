@@ -7,12 +7,19 @@ spec:
   endpointSelector: {}
 
   ingress:
-    # Keep the global ingress empty to allow pods to receive internal traffic,
-    # then restrict it in the individual app policies.
+    fromEntities:
+      - host
+      - remote-node
   egress:
     - toEntities:
+        - host
+        - remote-node
         - kube-apiserver
-        - dns
+        - health
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": kube-system
+            "k8s:k8s-app": kube-dns
 
     - toServices:
         - k8sService:
@@ -21,7 +28,7 @@ spec:
       toPorts:
         - ports:
             - port: "53"
-              protocol: UDP # DNS is almost exclusively UDP
+              protocol: ANY
     - toServices:
         - k8sService:
             serviceName: traefik
