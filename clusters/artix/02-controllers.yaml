@@ -5,10 +5,25 @@ metadata:
   name: layer-02-controllers
   namespace: flux-system
 spec:
-  interval: 1h
-  path: "./infrastructure/controllers"
+  dependsOn:
+    - name: layer-01-crds
+
+  interval: 15m
+  retryInterval: 2m
+  path: ./infrastructure/controllers
   prune: true
   wait: true
+  timeout: 5m
   sourceRef:
     kind: GitRepository
     name: flux-system
+
+  # --- PRODUCTION METADATA ---
+  commonMetadata:
+    labels:
+      app.kubernetes.io/part-of: platform-foundation
+      app.kubernetes.io/component: controllers
+      app.kubernetes.io/managed-by: flux
+    annotations:
+      artix.io/owner: "aner"
+      artix.io/description: "Core operators and binaries that manage cluster functionality."

@@ -3,3 +3,4 @@ charts/
 *.tfstate
 *.tfstate.backup
 manifests/
+docs/

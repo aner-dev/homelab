@@ -1,0 +1,63 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rustfs
+spec:
+  selector:
+    matchLabels:
+      app: rustfs # has to match .spec.template.metadata.labels
+
+  serviceName: "rustfs"
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: rustfs
+      labels:
+        app: rustfs # has to match .spec.selector.matchLabels
+
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: rustfs
+          image: ghcr.io/rustfs/rustfs:1.0.0-alpha.81
+          ports:
+            - containerPort: 9000
+              name: rustfs
+          # SENSE 1: Startup - "Wait until I'm ready for the first time"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            failureThreshold: 10
+            periodSeconds: 5
+          # SENSE 2: Liveness - "If I freeze, kill me"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          # SENSE 3: Readiness - "If I'm busy/broken, don't send me users"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+
+          volumeMounts:
+            - name: rustfs-data
+              mountPath: /data
+
+  volumeClaimTemplates: # Factory: creates new PVCs automatically for every replica I have
+    - metadata:
+        name: rustfs-data
+      spec:
+        storageClassName: local-path
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
