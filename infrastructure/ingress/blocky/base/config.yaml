@@ -36,8 +36,8 @@ conditional:
 customDNS:
   customTTL: 1h
   mapping:
-    vault.homelab: 192.168.1.50
-    gateway.homelab: 192.168.1.1
+    # this point to the Cilium LoadBalancer IP (*.homelab.local FQDNs convention)
+    homelab.local: 192.168.1.192
 
 # =========================================================
 # GLOBAL POLICIES (Security & Observability)

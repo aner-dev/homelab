@@ -5,7 +5,7 @@ resources:
   - ../base
 
 patches:
-  - path: service-patch.yaml
+  - path: gateway-patch.yaml
     target:
-      kind: Service
-      name: traefik
+      kind: gateway
+      name: internal-gateway

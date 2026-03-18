@@ -1,15 +1,17 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: traefik-gateway
+  name: internal-gateway
   namespace: traefik
   annotations:
-    # This annotation tells Cilium to assign an IP
-    # from my specific home network pool.
-    io.cilium/lb-ipam-ips: "192.168.1.192"
-
-    labels:
+    # Cilium looks for this to start ARP announcing on my LAN
     io.cilium/l2-announcer: "true"
+  labels:
     app.kubernetes.io/instance: traefik-production
     app.kubernetes.io/component: networking-entrypoint
     app.kubernetes.io/managed-by: flux
+spec:
+  # replaced cilium label with Gateway API "Native" way to request the .192 IP from the ip-pool
+  addresses:
+    - type: IPAddress
+      value: "192.168.1.192"

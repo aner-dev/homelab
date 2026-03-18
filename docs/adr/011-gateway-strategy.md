@@ -19,9 +19,11 @@ I am retaining the default Cilium RBAC permissions on the `cilium-operator` rath
 
 ## Rationale
 
+1. **Operational Simplicity over Micro-Optimization:** Traefik operates entirely in user-space as a standard Go-based reverse proxy. This abstracts away low-level networking, allowing me to debug L7 routing using standard HTTP logs and metrics. 
+2. **Avoiding eBPF Debugging Overhead:** While Cilium offers superior performance by bypassing the traditional network stack via eBPF, troubleshooting it requires specialized tooling (`hubble`, `cilium monitor`) and deep kernel-level knowledge. I am choosing to avoid this steep debugging curve at this stage.
+3. **Hardware Headroom:** The performance decrease of Traefik is a minor CPU overhead. The Ryzen 5 5600GT has more than enough compute power to absorb this without any noticeable bottleneck for a homelab environment.
+4. **Strategic Technical Debt:** (Keep your existing point about security and keeping the door open for future Cilium testing).
 
-1. **Maintaining Optionality:** I am choosing to "leave the door open" for a future replacement of Traefik with Cilium. Keeping the default permissions avoids the operational friction of modifying vendor manifests while I am still in the evaluation phase.
-2. **Strategic Technical Debt:** I am consciously accepting this security risk (increased blast radius) as manageable technical debt in a homelab environment to prioritize architectural flexibility and future testing of eBPF-accelerated L7 routing.
 
 ## Consequences
 - **Security:** The `cilium-operator` remains over-privileged. I must monitor this component as a high-value target.
