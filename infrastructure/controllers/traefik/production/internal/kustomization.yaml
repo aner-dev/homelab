@@ -1,0 +1,17 @@
+# infrastructure/controllers/traefik/overlays/internal/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - target:
+      kind: HelmRelease
+      name: traefik-base
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: traefik-external
+      - op: add
+        path: /spec/values/additionalArguments
+        value: 
+          - "--providers.kubernetesgateway.gatewayselectionlabel=gateway=external"

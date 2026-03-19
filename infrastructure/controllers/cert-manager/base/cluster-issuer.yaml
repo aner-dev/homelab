@@ -7,7 +7,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: your-email@domain.com
+    email: n0amh4w8@anonaddy.me
     privateKeySecretRef:
       name: letsencrypt-production-account-key
     profile: classic
