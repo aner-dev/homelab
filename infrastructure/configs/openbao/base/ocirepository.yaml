@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: openbao-chart
+  namespace: flux-system
+spec:
+  interval: 12h
+  url: oci://ghcr.io/openbao/charts/openbao
+  ref:
+    tag: 0.26.1

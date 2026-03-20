@@ -3,3 +3,6 @@ kind: Kustomization
 namespace: openbao
 resources:
   - namespace.yaml
+  - ocirepository.yaml
+  - httproute.yaml
+  - helm-release.yaml

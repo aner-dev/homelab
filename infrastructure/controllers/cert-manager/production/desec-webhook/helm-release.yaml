@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: desec-webhook-chart
+  namespace: flux-system
+spec:
+  interval: 12h
+  url: oci://ghcr.io/pr0ton11/helm/cert-manager-desec-webhook
+  ref:
+    digest: sha256:8cebd055f2dff5a94feff85c07f0b4799d076c3a563c9426c06a68a6c202815b

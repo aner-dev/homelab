@@ -1,9 +1,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - crd-acme.cert-manager.io_challenges.yaml
-  - crd-acme.cert-manager.io_orders.yaml
-  - crd-cert-manager.io_certificaterequests.yaml
-  - crd-cert-manager.io_certificates.yaml
-  - crd-cert-manager.io_clusterissuers.yaml
-  - crd-cert-manager.io_issuers.yaml
+  - manifests/
