@@ -3,5 +3,3 @@ kind: Kustomization
 resources:
   - gotk-components.yaml
   - gotk-sync.yaml
-  - ../cilium-controller.yaml
-  - ../cilium-config.yaml

@@ -5,6 +5,6 @@ resources:
   # reference the Flux Kustomization objects defined in this folder
   - 01-crds.yaml
   - 02-controllers.yaml
-  - 03-secrets.yaml
+  - 03-configs.yaml
   - 04-applications.yaml
   - 05-ingress.yaml

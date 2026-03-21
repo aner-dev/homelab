@@ -1,0 +1,33 @@
+# infrastructure/crds/external-secrets/sync.yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: src-${APP_NAME}
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: <URL>
+  ref:
+    tag: <TAG>
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infra-crds-${APP_NAME}
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 2m
+  timeout: 5m
+  prune: true
+  wait: true
+  path: "./<PATH>/crds" # Or wherever the source is
+  sourceRef:
+    kind: GitRepository
+    name: src-${APP_NAME}
+  targetNamespace: flux-system
+  # Common metadata helps me find resources in 'k9s' or 'kubectl'
+  commonMetadata:
+    labels:
+      managed-by: flux
+      app.kubernetes.io/part-of: homelab-infrastructure
