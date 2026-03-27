@@ -19,6 +19,7 @@ act = "0.2.84"
 dive = "0.13.1"
 flux2 = "2.8.3"
 yazi = "26.1.22"
+atuin = "18.13.5"
 
 # This globally masks any variable ending in _TOKEN in mise output
 
