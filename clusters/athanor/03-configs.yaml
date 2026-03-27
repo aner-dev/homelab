@@ -23,5 +23,5 @@ spec:
       app.kubernetes.io/part-of: platform-foundation
       app.kubernetes.io/component: state-and-secrets
     annotations:
-      artix.io/owner: "aner"
-      artix.io/description: "Manages persistent storage (Postgres) and sensitive data (OpenBao/ESO)."
+      athanor.io/owner: "aner"
+      athanor.io/description: "Manages persistent storage (Postgres) and sensitive data (OpenBao/ESO)."

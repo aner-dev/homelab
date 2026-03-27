@@ -6,4 +6,16 @@ vault-keys.txt
 *.tfstate
 *.tfstate.backup
 *.tfplan
-docs/prompts.md
+# Kubernetes local secrets
+kubeconfig.yaml
+.kube/
+*.kubeconfig
+
+# Age/Sops keys
+age.agekey
+.sops.yaml
+
+# Local Mise overrides
+.mise.local.toml
+.env
+.kubeconfig

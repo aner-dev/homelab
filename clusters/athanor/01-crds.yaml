@@ -21,8 +21,8 @@ spec:
       app.kubernetes.io/component: api-schemas
       app.kubernetes.io/managed-by: flux
     annotations:
-      artix.io/owner: "aner"
-      artix.io/description: "base custom resource definitions for controllers & operators"
+      athanor.io/owner: "aner"
+      athanor.io/description: "base custom resource definitions for controllers & operators"
 
   healthChecks:
     # Cilium
