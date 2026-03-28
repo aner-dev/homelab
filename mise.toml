@@ -20,6 +20,8 @@ dive = "0.13.1"
 flux2 = "2.8.3"
 yazi = "26.1.22"
 atuin = "18.13.5"
+"aqua:ast-grep/ast-grep" = "0.42.0"
+"aqua:BurntSushi/ripgrep" = "15.1.0"
 
 # This globally masks any variable ending in _TOKEN in mise output
 

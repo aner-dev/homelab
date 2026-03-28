@@ -1,0 +1,26 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: infra-foundation
+value: 900000000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+description: "Core cluster services. These pods are the last to be evicted."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: app-stateful
+value: 500000000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+description: "Stateful applications like Databases and Forgejo."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: app-ephemeral
+value: 100000000
+preemptionPolicy: Never # These pods will wait for a 'gap' in resources
+globalDefault: false
+description: "Stateless or non-critical apps that can be safely restarted."
