@@ -56,13 +56,16 @@ spec:
       defaultDataLocality: "best-effort"
 
       # --- Snapshot & Backup Management ---
+
       # Automatically cleans up old system snapshots to save space on your 810GB drive
       snapshotDataIntegrity: "fast-check"
       autoCleanupSystemGeneratedSnapshot: true
 
-      # --- Backup Target (Future Garage Deployment) ---
-      # backupTarget: "s3://longhorn-backups@us-east-1/"
-      # backupTargetCredentialSecret: "longhorn-backup-secret"
+      # --- Backup Target (Future Garage S3 storage Deployment) ---
+      backupTarget: "s3://linkding-backups@garage.internal:9000/" # Your Garage URL
+      backupTargetCredentialSecret: "garage-s3-auth" # Matches the target.name above
+      # If using a self-signed cert for Garage:
+      # backupTargetCertConfigMap: "garage-ca-cert"
     persistence:
       defaultClass: true
       reclaimPolicy: Retain # Protects data if I delete a PVC by mistake

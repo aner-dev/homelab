@@ -1,0 +1,87 @@
+# infrastructure/apps/linkding/base/helm-release.yaml
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: linkding-hr
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: linkding
+      version: "3.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: pascaliske
+        namespace: flux-system
+
+  # Ensure the Database and Secret exist before deploying
+  dependsOn:
+    - name: linkding-db
+    - name: linkding-es
+
+  values:
+    # 1. Controller Logic (Replicas & Resources)
+    controller:
+      type: deployment
+      # The chart uses 'updateStrategy' to map to K8s 'strategy'
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 1
+          maxSurge: 1
+      replicas: 1
+      # Define how the pod should behave during restarts
+      strategy: RollingUpdate
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: http
+        initialDelaySeconds: 10
+        periodSeconds: 20
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: http
+        initialDelaySeconds: 5
+        periodSeconds: 10
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+    # 2. Image (Pinned Version)
+    image:
+      repository: ghcr.io/sissbruecker/linkding
+      pullPolicy: IfNotPresent
+      tag: "1.45.0-plus"
+
+    # 3. Networking (Internal Port)
+    ports:
+      http:
+        port: 9090
+
+    # 4. Storage Logic
+    persistentVolumeClaim:
+      create: false # Tell the chart NOT to try creating its own PVC
+      existingPersistentVolumeClaim: "linkding-pvc-static" # Link to the manual one
+      name: "linkding-pvc"
+      storageClassName: "longhorn"
+      accessMode: "ReadWriteOnce"
+      size: "1Gi"
+      mountPath: "/etc/linkding/data"
+
+    # 5. Environment & Secrets
+    env:
+      - name: LD_DATABASE_URL
+        valueFrom:
+          secretKeyRef:
+            name: linkding-db-app
+            key: uri
+      - name: LD_SUPERUSER_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: linkding-env-secrets
+            key: LD_SUPERUSER_PASSWORD

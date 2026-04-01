@@ -1,11 +1,27 @@
-# naming conventions
-- this file aims to function as a guide to the choosed personal workflow and way to do things in my homelab
-- standarize, reducing cognitive friction and effort. 
-
 # 2026-02-24: <APP_NAME>-env-secrets
-## Secret Resource Standardization (ExternalSecret Targets)
+## Secret Resource Standardization (`kind: ExternalSecret` `spec.target`)
+This convention specifically governs the spec.target.name field within the ExternalSecret custom resource.
+While the `metadata.name` identifies the ESO "instruction" in the cluster, the `spec.target.name` defines the actual Kubernetes Secret object that is generated.
+By standardizing this target name, I ensure that the application's Deployment or Pod spec can consistently reference its environment variables using a predictable naming scheme.
+# code example / yaml manifest 
+```yaml 
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: linkding-es              # The ESO Instruction name
+spec:
+  target:
+    name: linkding-env-secrets   # <--- THIS is the standardized target name
+    creationPolicy: Owner
+  data:
+    - secretKey: LD_DATABASE_URL
+      remoteRef:
+        key: secret/data/apps/linkding # this follows the openbao naming convention for secret storage
+        property: db_url
+```
 ## The Problem: Bespoke Resource Naming
-Initial implementations utilized highly specific names for Kubernetes Secret targets (e.g., blocky-auth-credentials). This approach introduced significant cognitive overhead and prevented the creation of standardized automation.
+Initial implementations utilized highly specific names for Kubernetes Secret targets (e.g., blocky-auth-credentials).
+This approach introduced significant cognitive overhead and prevented the creation of standardized automation.
 In a bespoke naming environment, identifying which secret provides environment configuration for a given pod requires a manual inspection of the deployment.yaml and external-secret.yaml manifests.
 This lack of predictability increases the risk of configuration errors during refactoring and complicates the logic required for cluster-wide auditing scripts.
 
