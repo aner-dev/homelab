@@ -2,7 +2,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: traefik
-  namespace: flux-system # Often centralized here for cluster-wide access
+  namespace: flux-system
 spec:
-  interval: 24h # Low frequency for stable upstream charts
+  interval: 24h
   url: https://traefik.github.io/charts

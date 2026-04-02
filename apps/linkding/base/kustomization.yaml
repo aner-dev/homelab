@@ -1,11 +1,16 @@
+# apps/linkding/base/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+# Resources defines WHAT is in the app
 resources:
   - database.yaml
   - external-secret.yaml
   - helm-repository.yaml
   - helm-release.yaml
   - httproute.yaml
-  # Add these if you move them from production/
-  # - networkpolicy.yaml
-  # - scheduled-backup.yaml
+
+# Identity defines WHO the app is (Stable for Selectors)
+commonLabels:
+  app.kubernetes.io/name: linkding
+  app.kubernetes.io/part-of: athanor-core

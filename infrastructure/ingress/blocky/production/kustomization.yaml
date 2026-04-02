@@ -8,7 +8,7 @@ resources:
 labels:
   - pairs:
       environment: production
-      secret-access/vault: "true"
+      secret-access/openbao: "true"
     includeSelectors: false # Optional: Keeps Kustomize from breaking the existing Deployment selectors
 
 patches:

@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: cert-manager
   labels:
-    secret-access/vault: enabled
+    secret-access/openbao: enabled

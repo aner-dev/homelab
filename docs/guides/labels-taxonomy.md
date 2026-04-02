@@ -1,49 +1,130 @@
-# Athanor Cluster: Label & Metadata Taxonomy
+# Athanor Cluster: Label & Metadata Taxonomy (v2.0)
 
-This document serves as the **Source of Truth** for all metadata applied across the `athanor` cluster.
-All manifests MUST adhere to these conventions to ensure consistent networking (Cilium), storage (Longhorn), and GitOps (FluxCD) behavior.
+## 1. Identity Layer (Native Kustomize)
+*Defined in: `<APP>/base/kustomization.yaml`*
+*Purpose: Persistent "Who am I?" labels used for Selectors and Services.*
 
-## 1. Standard Kubernetes Labels (Identity)
-These MUST be applied to every `Deployment`, `StatefulSet`, and `Service`. 
-Reference: [Kubernetes Common Labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/)
-
-| Key | Purpose | Example |
+| Key | Example | Logic |
 | :--- | :--- | :--- |
-| `app.kubernetes.io/name` | The name of the application. | `linkding` |
-| `app.kubernetes.io/instance` | Unique name for the specific deploy. | `linkding-db` |
-| `app.kubernetes.io/part-of` | The high-level project/suite. | `athanor-core` |
-| `app.kubernetes.io/component` | The tier within the app. | `database` |
-| `app.kubernetes.io/managed-by` | The controller (usually Flux). | `flux` |
+| `app.kubernetes.io/name` | `linkding` | The primary identifier for the stack. |
+| `app.kubernetes.io/component` | `database` | Distinguishes tiers (web, db, redis). |
+| `app.kubernetes.io/part-of` | `athanor-core` | Groups apps into larger functional suites. |
 
 ---
 
-## 2. Infrastructure & Automation (Functional)
-These labels trigger specific cluster behaviors. **Warning:** Modifying these may change traffic flow or backup status.
+## 2. Governance Layer (Flux Kustomization API)
+*Defined in: `infrastructure/<APP>.yaml` (kind: Kustomization)*
+*Purpose: "Where am I?" labels applied at the cluster level for all app resources.*
 
-### A. Networking (Cilium)
-| Key | Value | Logic |
+| Key | Example | Logic |
 | :--- | :--- | :--- |
-| `io.cilium/l2-announced` | `"true"` | Triggers L2 Announcement for LoadBalancer IPs. |
-| `athanor.io/network-zone` | `dmz`, `internal`, `trusted` | Used by `CiliumClusterwideNetworkPolicy` to filter traffic. |
-
-### B. Storage & Backups (Longhorn / CNPG)
-| Key | Value | Logic |
-| :--- | :--- | :--- |
-| `athanor.io/backup-policy` | `daily`, `weekly`, `disabled` | Determines retention in Longhorn/CNPG schedules. |
-| `athanor.io/storage-tier` | `nvme`, `hdd` | (Future) To be used with Node Affinity for PV placement. |
+| `athanor.io/environment` | `production` | Separates prod/staging logic. |
+| `athanor.io/owner` | `aner` | Identifies the person/team responsible. |
+| `athanor.io/criticality` | `tier-1` | Used for alert routing and priority. |
+| `app.kubernetes.io/managed-by` | `flux` | Global indicator of the GitOps controller. |
 
 ---
 
-## 3. Governance & Metadata (Informational)
-Used for filtering with `kubectl`, `rg`, or `television`.
+## 3. Functional/Granular Layer (Individual Manifests)
+*Defined in: `database.yaml`, `ingress.yaml`, etc.*
+*Purpose: Specific triggers for Cilium, Longhorn, or external controllers.*
 
-| Key | Description |
-| :--- | :--- |
-| `athanor.io/owner` | The person/team responsible for the service. |
-| `athanor.io/environment` | `production`, `staging`, `lab`. |
-| `athanor.io/criticality` | `tier-0` (Core), `tier-1` (User apps), `tier-2` (Testing). |
+| Key | Example | Logic |
+| :--- | :--- | :--- |
+| `athanor.io/network-zone` | `internal` | Used by Cilium Network Policies. |
+| `athanor.io/backup-policy` | `daily` | Triggers Longhorn/CNPG backup schedules. |
+
+# 4. Implementation Examples
+## A. Snippet Configuration (Neovim/JSON)
+- Use these snippets to automate the "Identity vs. Governance" split.
+  - Notice how the Identity labels are baked into the Kustomize Native engine, while Governance is enforced by the Flux Orchestrator.
+
+```JSON
+{
+  "Flux Kustomization (Orchestrator)": {
+    "prefix": "fks",
+    "body": [
+      "apiVersion: kustomize.toolkit.fluxcd.io/v1",
+      "kind: Kustomization",
+      "metadata:",
+      "  name: ${1:app-name}",
+      "  namespace: flux-system",
+      "spec:",
+      "  targetNamespace: ${2:app-namespace}",
+      "  interval: 1h",
+      "  retryInterval: 2m",
+      "  path: ${3:./apps/app-name/production}",
+      "  prune: true",
+      "  wait: true",
+      "  sourceRef:",
+      "    kind: GitRepository",
+      "    name: flux-system",
+      "  commonMetadata:",
+      "    labels:",
+      "      athanor.io/environment: ${4|production,staging,lab|}",
+      "      athanor.io/owner: aner",
+      "      athanor.io/criticality: ${5|tier-1,tier-2,tier-0|}",
+      "      app.kubernetes.io/managed-by: flux"
+    ],
+    "description": "FluxCD Kustomization for Cluster Governance"
+  },
+  "Kustomize Native (Engine)": {
+    "prefix": "kust",
+    "body": [
+      "apiVersion: kustomize.config.k8s.io/v1beta1",
+      "kind: Kustomization",
+      "resources:",
+      "  - ${1:base.yaml}",
+      "commonLabels:",
+      "  app.kubernetes.io/name: ${2:app-name}",
+      "  app.kubernetes.io/part-of: athanor-core"
+    ],
+    "description": "Native Kustomize for Application Identity"
+  }
+}
+```
+## B. Case Study: Linkding Deployment (YAML)
+This example demonstrates the Hybrid Metadata Approach in action for the Linkding stack.
+
+```yaml
+# 1. ORCHESTRATOR: infrastructure/linkding.yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: linkding
+  namespace: flux-system
+spec:
+  path: "./apps/linkding/production"
+  targetNamespace: linkding
+  commonMetadata:
+    labels:
+      athanor.io/environment: production   # Governance
+      athanor.io/owner: aner               # Governance
+      athanor.io/criticality: tier-1       # Governance
+      app.kubernetes.io/managed-by: flux   # Governance
 
 ---
+# 2. ENGINE: apps/linkding/base/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - database.yaml
+  - helm-release.yaml
+commonLabels:
+  app.kubernetes.io/name: linkding         # Identity
+  app.kubernetes.io/part-of: athanor-core  # Identity
 
-## 4. Selection Best Practices (The "Selector" Rule)
-> **CRITICAL:** `matchLabels` used in `Services` or `NetworkPolicies` should rely on **Identity** labels (`app.kubernetes.io/name`) to ensure stability. Never use informational labels for selectors.
+---
+# 3. GRANULAR: apps/linkding/base/database.yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: linkding-db
+spec:
+  inheritedMetadata:
+    labels:
+      app.kubernetes.io/component: database # Specific Component
+      athanor.io/network-zone: internal     # Functional (Cilium)
+      athanor.io/backup-policy: daily       # Functional (CNPG)
+```
+

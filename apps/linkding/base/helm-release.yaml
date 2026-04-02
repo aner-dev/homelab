@@ -19,6 +19,15 @@ spec:
     - name: linkding-db
     - name: linkding-es
 
+  targetNamespace: linkding
+
+  wait: true
+  healthChecks:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      name: linkding-db
+      namespace: linkding
+
   values:
     # 1. Controller Logic (Replicas & Resources)
     controller:
@@ -74,14 +83,8 @@ spec:
       mountPath: "/etc/linkding/data"
 
     # 5. Environment & Secrets
-    env:
-      - name: LD_DATABASE_URL
-        valueFrom:
-          secretKeyRef:
-            name: linkding-db-app
-            key: uri
-      - name: LD_SUPERUSER_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: linkding-env-secrets
-            key: LD_SUPERUSER_PASSWORD
+    envFrom:
+      - configMapRef:
+          name: linkding-configmap
+      - secretRef:
+          name: linkding-env-secrets

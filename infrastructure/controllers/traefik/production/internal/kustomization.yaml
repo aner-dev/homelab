@@ -1,17 +1,24 @@
-# infrastructure/controllers/traefik/overlays/internal/kustomization.yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
 resources:
-  - ../../base
+  - ../../base # 1. Pull the base chart/repo
+  - internal-gateway.yaml # 2. Add the specific gateway
+  - gateway-class.yaml # 3. Add the class definition
+
 patches:
   - target:
       kind: HelmRelease
       name: traefik-base
-    patch: |
+    patch: |-
       - op: replace
         path: /metadata/name
-        value: traefik-external
+        value: traefik-internal
+      - op: replace
+        path: /spec/releaseName
+        value: traefik-internal
       - op: add
-        path: /spec/values/additionalArguments
+        path: /spec/values/providers/kubernetesGateway/labelSelector
+        value: "gateway=internal"
+      - op: add
+        path: /spec/values/deployment # <-- THE IDENTITY LAYER
         value: 
-          - "--providers.kubernetesgateway.gatewayselectionlabel=gateway=external"
+          podLabels:
+            athanor.io/gateway-zone: "internal"

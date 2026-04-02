@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
   name: blocky # placeholder
   labels:
-    secret-access/vault: true # ClusterSecretStore key
+    secret-access/openbao: true # ClusterSecretStore key
     # Infrastructure Tiers: they're excelent for "Group By" logic in monitoring dashboards (grafana)
     tier: infrastructure
     component: dns
