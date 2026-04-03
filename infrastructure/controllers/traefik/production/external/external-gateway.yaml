@@ -5,23 +5,33 @@ metadata:
   namespace: traefik
   labels:
     gateway: external
+    io.kubernetes.protocol/gateway: "true" # The key that unlocks the CCNP egress
 spec:
   gatewayClassName: traefik-external
-  addresses:
-    - value: 192.168.1.200
-      type: IPAddress
   listeners:
-    - name: https
-      protocol: HTTPS
-      port: 443
-      hostname: "*.yourdomain.com"
-      allowedRoutes:
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              exposure: public
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: public-wildcard-cert
+    listeners:
+      - name: http-redirect
+        protocol: HTTP
+        port: 80
+        # Traefik handles the redirect logic via a middleware or route rule
+        allowedRoutes:
+          namespaces:
+            from: Selector
+            selector:
+              matchLabels:
+                networking.homelab.local/external-gateway-access: "true"
+      - name: https
+        protocol: HTTPS
+        port: 443
+        hostname: "*.yourdomain.com"
+        tls:
+          mode: Terminate
+          certificateRefs:
+            - name: public-wildcard-cert
+        allowedRoutes:
+          namespaces:
+            from: Selector
+            selector:
+              matchLabels:
+                # Refactored for consistency with your internal gateway
+                networking.homelab.local/external-gateway-access: "true"

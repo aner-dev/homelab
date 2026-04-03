@@ -1,7 +1,12 @@
+# linkding/base/namespace.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
   name: linkding
   labels:
+    # This is the "Key" that matches the Gateway's 'allowedRoutes' selector
+    networking.homelab.local/internal-gateway-access: "true"
+    # This is the "Identity" used by the Linkding CNP for pod-to-pod security
     athanor.io/gateway-zone: internal
+    # openbao secret access
     secret-access/openbao: "enabled"

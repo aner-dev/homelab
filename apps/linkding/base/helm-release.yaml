@@ -28,8 +28,8 @@ spec:
       name: linkding-db
       namespace: linkding
 
-  values:
     # 1. Controller Logic (Replicas & Resources)
+  values:
     controller:
       type: deployment
       # The chart uses 'updateStrategy' to map to K8s 'strategy'
@@ -53,6 +53,8 @@ spec:
           port: http
         initialDelaySeconds: 5
         periodSeconds: 10
+
+    # 2. Resources Management
     resources:
       requests:
         cpu: "100m"
@@ -61,18 +63,18 @@ spec:
         cpu: "500m"
         memory: "512Mi"
 
-    # 2. Image (Pinned Version)
+    # 3. Image (Pinned Version)
     image:
       repository: ghcr.io/sissbruecker/linkding
       pullPolicy: IfNotPresent
       tag: "1.45.0-plus"
 
-    # 3. Networking (Internal Port)
+    # 4. Networking (Internal Port)
     ports:
       http:
         port: 9090
 
-    # 4. Storage Logic
+    # 5. Storage Logic
     persistentVolumeClaim:
       create: false # Tell the chart NOT to try creating its own PVC
       existingPersistentVolumeClaim: "linkding-pvc-static" # Link to the manual one
@@ -82,9 +84,15 @@ spec:
       size: "1Gi"
       mountPath: "/etc/linkding/data"
 
-    # 5. Environment & Secrets
+    # 6. Environment & Secrets
     envFrom:
       - configMapRef:
           name: linkding-configmap
       - secretRef:
           name: linkding-env-secrets
+    # 7. Labels
+    podLabels:
+      # This ensures the Pod carries the identity that the CNP expects
+      athanor.io/gateway-zone: internal
+      # This ensures the Pod is recognized as the 'linkding' app
+      app.kubernetes.io/name: linkding

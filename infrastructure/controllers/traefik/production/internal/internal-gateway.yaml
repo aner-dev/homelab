@@ -1,35 +1,34 @@
 apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway #TODO: read `vim.lsp.buf.hover()` help page
+kind: Gateway
 metadata:
   name: internal-gateway
   namespace: traefik
   labels:
     gateway: internal
+    io.kubernetes.protocol/gateway: "true" # The key that unlocks the CCNP egress
 spec:
   gatewayClassName: traefik-internal
   listeners:
     - name: http
       protocol: HTTP
       port: 80
-      allowedRoutes: # the `Exceptions`
+      allowedRoutes:
         namespaces:
-          from: All
+          from: Selector
+          selector:
+            matchLabels:
+              # Only namespaces with this label can attach to this Gateway
+              networking.homelab.local/internal-gateway-access: "true"
     - name: websecure
       protocol: HTTPS
       port: 443
       allowedRoutes:
-        from: Selector
-        selector:
-          matchLabels:
-            # Only namespaces with this label can attach to this Gateway
-            networking.homelab.local/internal-gateway-access: "true"
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              networking.homelab.local/internal-gateway-access: "true"
 
-      # - name: minecraft <- see `docs/guides/future-improvements`
-      #   protocol: TCP
-      #   port: 25565
-      #   allowedRoutes:
-      #     namespaces:
-      #       from: All
       tls:
         mode: Terminate
         certificateRefs:

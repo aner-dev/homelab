@@ -1,41 +1,77 @@
-apiVersion: "cilium.io/v2"
+kpiVersion: "cilium.io/v2"
 kind: CiliumClusterwideNetworkPolicy
 metadata:
   name: "global-zero-trust-baseline"
 spec:
   description: "Enforces a default-deny ingress/egress posture while permitting core cluster infrastructure communications."
-  endpointSelector: {}
+  endpointSelector: {} # Selects all managed endpoints to initiate default-deny
 
   ingress:
-    fromEntities:
-      - host
-      - remote-node
+    - fromEntities:
+        - host
+        - remote-node
+
   egress:
+    # Infrastructure: Core connectivity
     - toEntities:
         - host
         - remote-node
         - kube-apiserver
         - health
+
+    # Infrastructure: Internal K8s DNS
     - toEndpoints:
         - matchLabels:
             "k8s:io.kubernetes.pod.namespace": kube-system
             "k8s:k8s-app": kube-dns
-
-    - toServices:
-        - k8sService:
-            serviceName: blocky
-            namespace: blocky
       toPorts:
         - ports:
             - port: "53"
               protocol: ANY
-    - toServices:
-        - k8sService:
-            serviceName: traefik
-            namespace: traefik
+
+    # 1. Identity: Edge Gateway (Traefik)
+    - toEndpoints:
+        - matchLabels:
+            networking.homelab.local/gateway-provider: "true"
       toPorts:
         - ports:
             - port: "80"
               protocol: TCP
             - port: "443"
+              protocol: TCP
+
+    # 2. Identity: External DNS (Blocky)
+    - toEndpoints:
+        - matchLabels:
+            networking.homelab.local/dns-provider: "true"
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+
+    # 3. Identity: Database (PostgreSQL)
+    - toEndpoints:
+        - matchLabels:
+            networking.homelab.local/db-provider: "true"
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+
+    # 4. Identity: Observability (Prometheus/Metrics)
+    - toEndpoints:
+        - matchLabels:
+            networking.homelab.local/metrics-provider: "true"
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+
+    # 5. Identity: Cache (Redis)
+    - toEndpoints:
+        - matchLabels:
+            networking.homelab.local/cache-provider: "true"
+      toPorts:
+        - ports:
+            - port: "6379"
               protocol: TCP

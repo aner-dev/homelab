@@ -1,3 +1,7 @@
+# pending apps
+- postgrest (REST api for postgres)
+- restic 
+- volsync (storage management)
 # Storage Logic Audit: Concise vs. Verbose
 
 | Feature | Status | Why? |
