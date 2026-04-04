@@ -15,4 +15,23 @@ spec:
         namespace: flux-system
   values:
     controller:
-      replicas: 1 # Stick to 1 for now; DNS caching is simpler
+      replicas: 1
+
+      service:
+      main: # The 'bjw-s' library usually calls the primary service 'main'
+        enabled: true
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: "192.168.1.195"
+        ports:
+          dns-udp:
+            enabled: true
+            port: 53
+            protocol: UDP
+          dns-tcp:
+            enabled: true
+            port: 53
+            protocol: TCP
+          http:
+            enabled: true
+            port: 4000

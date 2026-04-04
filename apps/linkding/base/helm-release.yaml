@@ -32,12 +32,6 @@ spec:
   values:
     controller:
       type: deployment
-      # The chart uses 'updateStrategy' to map to K8s 'strategy'
-      updateStrategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxUnavailable: 1
-          maxSurge: 1
       replicas: 1
       # Define how the pod should behave during restarts
       strategy: RollingUpdate
@@ -92,7 +86,10 @@ spec:
           name: linkding-env-secrets
     # 7. Labels
     podLabels:
-      # This ensures the Pod carries the identity that the CNP expects
-      athanor.io/gateway-zone: internal
-      # This ensures the Pod is recognized as the 'linkding' app
-      app.kubernetes.io/name: linkding
+    # 1. K8S STANDARDS (Identity)
+    app.kubernetes.io/name: linkding
+    app.kubernetes.io/component: app
+    app.kubernetes.io/part-of: athanor-core
+
+    # 2. ATHANOR STANDARDS (Security/Functional)
+    athanor.io/network-zone: internal
