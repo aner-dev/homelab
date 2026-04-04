@@ -6,6 +6,6 @@ provisioner: driver.longhorn.io
 allowVolumeExpansion: true
 reclaimPolicy: Retain
 parameters:
-  numberOfReplicas: "1" # single-node homelab
+  numberOfReplicas: "1" # single-node athanor
   staleReplicaTimeout: "2880"
   fsType: "ext4"

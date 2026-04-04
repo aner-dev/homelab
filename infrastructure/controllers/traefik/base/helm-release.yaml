@@ -3,6 +3,9 @@ kind: HelmRelease
 metadata:
   name: traefik-base
   namespace: traefik
+  annotations:
+    lbipam.cilium.io/ips: "192.168.1.195"
+
 spec:
   releaseName: traefik
   interval: 1h
@@ -27,12 +30,31 @@ spec:
   driftDetection:
     mode: enabled
   values:
-    ingressRoute:
-      dashboard:
-        enabled: true
-        matchRule: "Host(`dashboard.localhost`)"
-        entryPoints:
-          - web
+    service:
+  enabled: true
+  type: LoadBalancer
+  # The Label that connects Traefik to your 'home-lan-lb-pool'
+  labels:
+    io.cilium/ipam-pool: "lan-expose"
+  # The Annotation that "pins" the specific IP
+  annotations:
+    lbipam.cilium.io/ips: "192.168.1.192"
+  spec:
+    externalTrafficPolicy: Local # Preserves Client Source IP
+
     providers:
+      kubernetesCRD:
+        enabled: true
       kubernetesGateway:
         enabled: true
+
+    # Inside values:
+    ingressRoute:
+      dashboard:
+        enabled: false # We are "outsourcing" this to a separate manifest
+
+    logs:
+      general:
+        level: "INFO"
+      access:
+        enabled: true # Highly recommended for debugging L7

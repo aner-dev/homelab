@@ -8,7 +8,7 @@ spec:
     - name: internal-gateway # Change to 'external-gateway' if public
       namespace: traefik
   hostnames:
-    - "linkding.homelab.local"
+    - "linkding.athanor.local"
   rules:
     - matches:
         - path:

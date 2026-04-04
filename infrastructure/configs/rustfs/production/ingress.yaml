@@ -12,7 +12,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: s3.homelab.local
+    - host: s3.athanor.local
       http:
         paths:
           - path: /

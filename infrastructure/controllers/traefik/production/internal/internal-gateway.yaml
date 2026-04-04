@@ -18,7 +18,7 @@ spec:
           selector:
             matchLabels:
               # Only namespaces with this label can attach to this Gateway
-              networking.homelab.local/internal-gateway-access: "true"
+              networking.athanor.local/internal-gateway-access: "true"
     - name: websecure
       protocol: HTTPS
       port: 443
@@ -27,10 +27,10 @@ spec:
           from: Selector
           selector:
             matchLabels:
-              networking.homelab.local/internal-gateway-access: "true"
+              networking.athanor.local/internal-gateway-access: "true"
 
       tls:
         mode: Terminate
         certificateRefs:
-          - name: homelab-wildcard-cert # This will be created later with Cert-Manager
+          - name: athanor-wildcard-cert # This will be created later with Cert-Manager
 

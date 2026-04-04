@@ -18,4 +18,4 @@ generatorOptions:
 labels:
   - pairs:
       app.kubernetes.io/name: blocky
-      app.kubernetes.io/part-of: homelab-infrastructure
+      app.kubernetes.io/part-of: athanor-infrastructure

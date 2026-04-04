@@ -32,7 +32,7 @@ spec:
     # 1. Identity: Edge Gateway (Traefik)
     - toEndpoints:
         - matchLabels:
-            networking.homelab.local/gateway-provider: "true"
+            networking.athanor.local/gateway-provider: "true"
       toPorts:
         - ports:
             - port: "80"
@@ -43,7 +43,7 @@ spec:
     # 2. Identity: External DNS (Blocky)
     - toEndpoints:
         - matchLabels:
-            networking.homelab.local/dns-provider: "true"
+            networking.athanor.local/dns-provider: "true"
       toPorts:
         - ports:
             - port: "53"
@@ -52,7 +52,7 @@ spec:
     # 3. Identity: Database (PostgreSQL)
     - toEndpoints:
         - matchLabels:
-            networking.homelab.local/db-provider: "true"
+            networking.athanor.local/db-provider: "true"
       toPorts:
         - ports:
             - port: "5432"
@@ -61,7 +61,7 @@ spec:
     # 4. Identity: Observability (Prometheus/Metrics)
     - toEndpoints:
         - matchLabels:
-            networking.homelab.local/metrics-provider: "true"
+            networking.athanor.local/metrics-provider: "true"
       toPorts:
         - ports:
             - port: "9090"
@@ -70,7 +70,7 @@ spec:
     # 5. Identity: Cache (Redis)
     - toEndpoints:
         - matchLabels:
-            networking.homelab.local/cache-provider: "true"
+            networking.athanor.local/cache-provider: "true"
       toPorts:
         - ports:
             - port: "6379"

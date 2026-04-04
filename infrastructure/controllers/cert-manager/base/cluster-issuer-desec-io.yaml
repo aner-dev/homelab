@@ -41,7 +41,7 @@ metadata:
   name: vault-issuer
 spec:
   vault:
-    path: pki/sign/homelab-dot-local # Path in your OpenBao PKI engine
+    path: pki/sign/athanor-dot-local # Path in your OpenBao PKI engine
     server: http://openbao-active.openbao.svc.cluster.local:8200
     auth:
       kubernetes:

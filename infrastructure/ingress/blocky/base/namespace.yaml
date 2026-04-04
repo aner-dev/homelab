@@ -17,4 +17,4 @@ metadata:
   annotations:
     # Documentation & Ownership
     home.lab/owner: "aner"
-    home.lab/description: "Primary DNS resolution for the homelab"
+    home.lab/description: "Primary DNS resolution for the athanor"

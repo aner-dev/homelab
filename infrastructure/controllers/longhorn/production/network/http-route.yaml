@@ -9,7 +9,7 @@ spec:
       namespace: traefik
       sectionName: websecure # points to port 443 listener (kind: Gateway)
   hostnames: # defines L7 (Layer 7) rule. Traefik will look at the Host header of the incoming HTTP request.
-    - "longhorn.homelab.local" # If it sees longhorn.homelab.local, it triggers this rule.
+    - "longhorn.athanor.local" # If it sees longhorn.athanor.local, it triggers this rule.
   rules:
     - matches:
         - path:

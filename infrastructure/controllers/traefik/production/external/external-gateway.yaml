@@ -19,7 +19,7 @@ spec:
             from: Selector
             selector:
               matchLabels:
-                networking.homelab.local/external-gateway-access: "true"
+                networking.athanor.local/external-gateway-access: "true"
       - name: https
         protocol: HTTPS
         port: 443
@@ -34,4 +34,4 @@ spec:
             selector:
               matchLabels:
                 # Refactored for consistency with your internal gateway
-                networking.homelab.local/external-gateway-access: "true"
+                networking.athanor.local/external-gateway-access: "true"

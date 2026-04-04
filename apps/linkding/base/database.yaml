@@ -19,7 +19,7 @@ spec:
       # --- Functional / Infrastructure ---
       athanor.io/network-zone: internal
       athanor.io/backup-policy: daily
-      networking.homelab.local/db-provider: "true" # The "Key" for the Global Baseline
+      networking.athanor.local/db-provider: "true" # The "Key" for the Global Baseline
 
       # --- Governance ---
       athanor.io/environment: production

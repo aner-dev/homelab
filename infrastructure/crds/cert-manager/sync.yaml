@@ -29,4 +29,4 @@ spec:
   commonMetadata:
     labels:
       managed-by: flux
-      app.kubernetes.io/part-of: homelab-infrastructure
+      app.kubernetes.io/part-of: athanor-infrastructure

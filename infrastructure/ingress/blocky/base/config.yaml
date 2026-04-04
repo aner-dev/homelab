@@ -36,8 +36,8 @@ conditional:
 customDNS:
   customTTL: 1h
   mapping:
-    # this point to the Cilium LoadBalancer IP (*.homelab.local FQDNs convention)
-    homelab.local: 192.168.1.192
+    # this point to the Cilium LoadBalancer IP (*.athanor.local FQDNs convention)
+    athanor.local: 192.168.1.192
 
 # =========================================================
 # GLOBAL POLICIES (Security & Observability)
