@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: blocky-tls
+  namespace: blocky # Keep it in the same namespace as the pod
+spec:
+  secretName: blocky-tls-secret
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "dns.athanor.local"
+  dnsNames:
+    - "dns.athanor.local"
+  privateKey:
+    algorithm: ECDSA
+    size: 256

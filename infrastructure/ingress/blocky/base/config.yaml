@@ -1,38 +1,76 @@
-# =========================================================
-# LAYER 1: EXTERNAL INTERNET (The Privacy Gateway)
-# Handles all public traffic via DoH with FOSS-first failover.
-# =========================================================
-upstreams:
-  init:
-    strategy: fast
-  timeout: 3s
-  userAgent: "Gemini-Homelab-Blocky/1.0"
-  strategy: strict
+# --- Basic/Global Configuration ---
+# Prioritizing modern TLS and explicit IP versioning
+minTlsServeVersion: 1.3
+connectIPVersion: v4
 
+# --- Ports & Addresses ---
+# Using the Gateway API persona model:
+# The Infrastructure Provider (you) defines where the 'river' starts.
+ports:
+  dns: 53
+  tls: 853
+  http: 4000 # Used for Prometheus metrics & REST API
+  https: 443 # Used for DoH (DNS over HTTPS)
+
+# --- Logging Configuration ---
+# Structured logging
+log:
+  level: info
+  format: json # Use 'json' to pipe logs to Loki/Grafana
+  timestamp: true
+  privacy: false # Set to 'true' only if I need to hide the DNS history from logs
+
+clientLookup:
+  upstream: 10.96.0.10 # CoreDNS Service IP
+  singleNameOrder:
+    - 1 # Take the first name returned (usually the FQDN)
+
+upstreams:
   groups:
+    # High-Privacy Apps (Wildcard match for Pod names)
+    "searxng*":
+      - privacy
+    "simplex*":
+      - privacy
+    # Artix Host (Physical Identity)
+    192.168.100.239:
+      - privacy
+    127.0.0.1:
+      - privacy
+
+    # The Rest of the Cluster (The "Worker" CIDR)
+    10.42.0.0/24:
+      - velocity
+
+    velocity:
+      - https://1.1.1.1/dns-query # cloudflare
+      - https://9.9.9.9/dns-query # quad9
+    privacy:
+      - https://all.dns.mullvad.net/dns-query # [sweden, gothenburg]
+      - https://dns.quad9.net/dns-query # [switzerland]
+      - https://doh.libredns.gr/dns-query # [greek]
+      - https://protected.canadianshield.cira.ca/dns-query # [canada]
     default:
-      - https://doh.libredns.gr/dns-query
-      - https://dns.mullvad.net/dns-query
-      - https://cloudflare-dns.com/dns-query
-      - https://dns.google/dns-query
+      - https://base.dns.mullvad.net/dns-query
+      - https://adblock.dns.mullvad.net/dns-query
+      - https://doh.libredns.gr/noads #
+      - https://desec.io/dns-query
+
+  strategy: random
 
 # BOOTSTRAP: Solves the "Chicken & Egg" loop for DoH.
 bootstrapDns:
-  - https://1.1.1.1/dns-query
+  - https://1.1.1.1/dns-query # Use a reliable, fast Anycast IP to find the privacy upstreams
   - 8.8.8.8
 
-# =========================================================
-# LAYER 2: INTERNAL K8S (The Cluster Hub)
-# Bridges the gap between Blocky and K8s Service Discovery.
-# =========================================================
 conditional:
+  fallbackUpstream: false # Tight security: don't ask Google for internal names
   mapping:
-    cluster.local: 10.96.0.10 # Standard CoreDNS IP
+    cluster.local: 10.96.0.10
+    athanor.local: 10.96.0.10
+    # Reverse DNS for Pods (Important for clientLookup)
+    42.10.in-addr.arpa: 10.96.0.10
 
-# =========================================================
-# LAYER 3: LOCAL HOMELAB (The Spoke Map)
-# Resolves internal human-friendly names to physical Node IPs.
-# =========================================================
 customDNS:
   customTTL: 1h
   mapping:
@@ -42,6 +80,7 @@ customDNS:
 # =========================================================
 # GLOBAL POLICIES (Security & Observability)
 # =========================================================
+
 blocking:
   blackLists:
     ads:
@@ -51,19 +90,29 @@ blocking:
       - ads
   blockTTL: 1m
 
+# --- PERFORMANCE LAYER ---
 caching:
   minTime: 5m
   maxTime: 30m
-  prefetching: true
+  prefetching: true # Senior choice: keeps your favorite sites "warm"
+  prefetchThreshold: 5
+  prefetchExpires: 2h
 
+# --- OBSERVABILITY LAYER ---
+# Note: Ensure your 'ports' section has an 'http' port defined (usually 4000)
 prometheus:
   enable: true
   path: /metrics
 
-ports:
-  dns: 53
-  http: 4000
+# --- STATEFUL LAYER ---
+# cache database
+# Skip Redis for now to keep the architecture lean.
 
-log:
-  level: info
-  format: text
+# --- QUERY LOGGING ---
+queryLog:
+  type: console # Keep it lean: logs go to stdout for 'kubectl logs'
+  fields:
+    - clientName # Since we set up clientLookup, this is very useful!
+    - question
+    - responseReason
+    - duration

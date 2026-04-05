@@ -35,3 +35,21 @@ spec:
           http:
             enabled: true
             port: 4000
+      persistence:
+        # This name (certs) is the identifier for the volume
+        certs:
+          enabled: true
+          type: secret
+          name: blocky-tls-secret # Matches the secretName in your Certificate manifest
+          mountPath: /etc/blocky/certs
+          readOnly: true
+
+      # Ensure the config file is also mounted correctly
+      # Usually provided via ConfigMap or Secret
+      config:
+        enabled: true
+        type: configMap
+        name: blocky-config
+        mountPath: /etc/blocky/config.yaml
+        subPath: config.yaml
+        readOnly: true
