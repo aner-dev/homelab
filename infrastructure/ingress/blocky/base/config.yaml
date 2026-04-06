@@ -11,6 +11,8 @@ ports:
   tls: 853
   http: 4000 # Used for Prometheus metrics & REST API
   https: 443 # Used for DoH (DNS over HTTPS)
+certFile: /etc/blocky/certs/tls.crt
+keyFile: /etc/blocky/certs/tls.key
 
 # --- Logging Configuration ---
 # Structured logging
@@ -116,3 +118,9 @@ queryLog:
     - question
     - responseReason
     - duration
+
+dnssec:
+  validate: true
+
+ede:
+  enable: true

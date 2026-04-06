@@ -53,7 +53,8 @@ by just adding the application name (the prefix) to `upstreams.groups`, I am abl
   - **Timeout:** If your network or your ISP doesn't support IPv6 properly, the app waits for a timeout before falling back to IPv4.
   - **Latency:** This adds milliseconds of latency to every single connection.
 
-- Production: In an IPv4-only cluster (like many homelabs), filtering AAAA queries makes the network feel "snappier" because Blocky immediately tells the app "IPv6 doesn't exist here," forcing an instant IPv4 connection.
+- Production: **force an IPv4 connection**.
+  - In an IPv4-only cluster (like many homelabs), filtering AAAA queries makes the network feel "snappier" because Blocky immediately tells the app "IPv6 doesn't exist here," forcing an instant IPv4 connection.
 ## Application in config.yaml:
 ```yaml
 filtering:
@@ -241,3 +242,29 @@ Asynchronous Logging: Most modern tools (like Blocky) use a "buffer." They answe
 |**3. Internal Audit**|**`kubectl logs`**|Check Blocky `queryLog` (Console).|See the query and the "Privacy" group.|
 |**4. Wire Audit**|**`tcpdump`**|Monitor `eth0` on port 53.|**Total Silence** (No packets detected).|
 |**5. Verification**|**`tcpdump`**|Monitor `eth0` on port 443 (HTTPS).|Encrypted "noise" going to Mullvad/LibreDNS.|
+
+# audit of applied fields 
+|**Section**|**Status**|**Senior Audit Note**|
+|---|---|---|
+|**Basic / Ports**|**Applied**|You defined the `https` port, but it will **fail to start** without the `certFile` and `keyFile`.|
+|**Upstream Groups**|**Applied**|Excellent use of wildcarding (`searxng*`). This is a very clean way to handle dynamic K8s pod names.|
+|**Client Lookup**|**Applied**|You're correctly hitting CoreDNS for PTR (Reverse DNS) records.|
+|**Conditional DNS**|**Applied**|Perfect for avoiding "Leaking" internal names to the public internet.|
+|**Custom DNS**|**Applied**|Good, but consider using **CNAMEs** if you want to alias multiple services to one LoadBalancer.|
+|**Blocking**|**Applied**|Basic setup is there. You are missing `allowLists` (crucial for when `StevenBlack` breaks a legitimate site).|
+|**Caching**|**Applied**|`prefetching: true` is the right move for low-latency performance.|
+|**Query Logging**|**Applied**|`type: console` is optimal for the current stage.|
+## DNSSEC / `dnssec.enabled:true`
+```yaml
+dnssec:
+  enabled: true
+```
+- Blocky uses the industry-standard RFC rules for validation as default.
+- default fields being applied by this config:
+
+|**Field**|**Why the Default is usually Best**|
+|---|---|
+|**`maxChainDepth`**|10 is standard. Going deeper is almost always a sign of a DNS loop or a malicious attack.|
+|**`clockSkewTolerance`**|3600s (1 hour). Signature validation depends on time. If your Artix clock is off by more than an hour, your DNS will break. You shouldn't "fix" this in Blocky; you should fix your **NTP** service on the host.|
+|**`trustAnchors`**|Blocky includes the official Root Trust Anchors by default. You only change this if you are running a completely private, air-gapped internet.|
+|**`maxNSEC3Iterations`**|NSEC3 is used to prove a record _doesn't_ exist. High iterations are a "CPU Exhaustion" attack vector. 150 is the "Sweet Spot" for security vs. performance.|

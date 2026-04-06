@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openbao-pki-bootstrap
+  namespace: openbao
+  annotations:
+    # Tip: This tells Flux to recreate the job if the config changes
+    configmap.reloader.stakater.com/reload: "openbao-config"
+spec:
+  template:
+    spec:
+      containers:
+        - name: bao-cli
+          image: quay.io/openbao/openbao:2.0.0 # Use your specific version
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              # 1. Wait for OpenBao to be ready
+              until bao status -address=http://openbao:8200; do echo "Waiting for OpenBao..."; sleep 5; done;
+
+              # 2. Authenticate (Using a pre-existing Kubernetes Auth or Root Token secret)
+              # In a real production setup, use a ServiceAccount token here.
+              export BAO_ADDR="http://openbao:8200"
+
+              # 3. Enable PKI Secrets Engine
+              bao secrets enable pki || echo "PKI already enabled"
+
+              # 4. Tune the PKI engine for long-lived certificates
+              bao secrets tune -max-lease-ttl=87600h pki
+
+              # 5. Generate the Internal Root CA
+              # This is the "Wax Seal" we discussed!
+              bao write -field=certificate pki/root/generate/internal \
+                  common_name="athanor.local" \
+                  ttl=87600h > /tmp/root_ca.crt
+
+              # 6. Configure CA and CRL URLs
+              bao write pki/config/urls \
+                  issuing_certificates="http://openbao.openbao.svc.cluster.local:8200/v1/pki/ca" \
+                  crl_distribution_points="http://openbao.openbao.svc.cluster.local:8200/v1/pki/crl"
+
+              # 7. Create a Role for your Cluster (The "Policy")
+              bao write pki/roles/athanor-dot-local \
+                  allowed_domains="athanor.local" \
+                  allow_subdomains=true \
+                  max_ttl=720h # 30 days for leaf certs (Senior/Security choice)
+          env:
+            - name: BAO_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: openbao-root-token # Ensure this secret exists with the initial token
+                  key: token
+      restartPolicy: OnFailure
+  # Clean up the pod after 1 hour so it doesn't clutter your namespace
+  ttlSecondsAfterFinished: 3600
