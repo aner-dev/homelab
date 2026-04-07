@@ -23,7 +23,7 @@ spec:
   values:
     # --- install CRDs ---
     crd:
-      enabled: true
+      enabled: false
     # --- Policy Logic  ---
     kubeProxyReplacement: true
     policyDenyResponse: "icmp" # communication feedback loop logic
@@ -55,3 +55,28 @@ spec:
     # --- Operator Config ---
     operator:
       replicas: 1
+
+    # --- Service Mesh ---
+    l7Proxy: true # Envoy proxy
+
+    # 4. Enable Mutual Authentication (security)
+    # This will eventually link to an OpenBao/SPIRE setup
+    authentication:
+      mutual:
+        spiffe:
+          enabled: true
+        # This installs the SPIRE server and agents automatically
+        spire:
+          enabled: true
+          install:
+            enabled: true
+            server:
+              dataStorage:
+                enabled: false # Use in-memory for your local lab
+    # Observability (Hubble)
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+      ui:
+        enabled: true

@@ -4,7 +4,7 @@ metadata:
   name: linkding-allow-ingress
   namespace: linkding
 spec:
-  description: "App-specific networking isolation for linkding"
+  description: "App-specific networking isolation and mTLS enforcement for linkding"
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: linkding
@@ -12,6 +12,8 @@ spec:
     - fromEndpoints:
         - matchLabels:
             athanor.io/gateway-zone: internal
+      authentication:
+        mode: "required"
       toPorts:
         - ports:
             - port: "9090"

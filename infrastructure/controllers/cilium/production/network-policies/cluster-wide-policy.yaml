@@ -3,23 +3,20 @@ kind: CiliumClusterwideNetworkPolicy
 metadata:
   name: "global-zero-trust-baseline"
 spec:
-  description: "Enforces a default-deny ingress/egress posture while permitting core cluster infrastructure communications."
-  endpointSelector: {} # Selects all managed endpoints to initiate default-deny
+  description: "Universal Deny-All with Infrastructure Essentials (DNS & API)."
+  endpointSelector: {}
 
   ingress:
     - fromEntities:
         - host
         - remote-node
-
-  egress:
-    # Infrastructure: Core connectivity
-    - toEntities:
-        - host
-        - remote-node
-        - kube-apiserver
         - health
 
-    # Infrastructure: Internal K8s DNS
+  egress:
+    # 1. Core Infrastructure (L3/L4)
+    - toEntities: [host, remote-node, health]
+
+    # 2. Internal K8s DNS (service discovery)
     - toEndpoints:
         - matchLabels:
             "k8s:io.kubernetes.pod.namespace": kube-system
@@ -29,49 +26,11 @@ spec:
             - port: "53"
               protocol: ANY
 
-    # 1. Identity: Edge Gateway (Traefik)
+    # 3. External DNS / Blocky (external resolution)
     - toEndpoints:
         - matchLabels:
-            networking.athanor.local/gateway-provider: "true"
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
-            - port: "443"
-              protocol: TCP
-
-    # 2. Identity: External DNS (Blocky)
-    - toEndpoints:
-        - matchLabels:
-            networking.athanor.local/dns-provider: "true"
+            networking.athanor.local/role: dns
       toPorts:
         - ports:
             - port: "53"
               protocol: ANY
-
-    # 3. Identity: Database (PostgreSQL)
-    - toEndpoints:
-        - matchLabels:
-            networking.athanor.local/db-provider: "true"
-      toPorts:
-        - ports:
-            - port: "5432"
-              protocol: TCP
-
-    # 4. Identity: Observability (Prometheus/Metrics)
-    - toEndpoints:
-        - matchLabels:
-            networking.athanor.local/metrics-provider: "true"
-      toPorts:
-        - ports:
-            - port: "9090"
-              protocol: TCP
-
-    # 5. Identity: Cache (Redis)
-    - toEndpoints:
-        - matchLabels:
-            networking.athanor.local/cache-provider: "true"
-      toPorts:
-        - ports:
-            - port: "6379"
-              protocol: TCP

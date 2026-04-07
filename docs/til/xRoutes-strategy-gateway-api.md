@@ -23,7 +23,7 @@ The Gateway API splits the configuration into three distinct personas:
 
 ### 2. The "ReferenceGrant" Tax
 If we centralize routes in a single namespace (e.g., `traefik`), every route would need to "reach into" the application namespace to find its `Service`. 
-* **The Penalty:** You would have to create a `ReferenceGrant` for every app.
+* **The Penalty:** I would have to create a `ReferenceGrant` for every app.
 * **The Benefit of Decentralization:** By placing the `HTTPRoute` inside the app's namespace, it "attaches" to the Gateway without needing a security handshake, because the route and service share the same trust boundary.
 
 ### 3. GitOps Lifecycle Alignment
@@ -39,6 +39,6 @@ By keeping the `linkding-rt.yaml` inside the `linkding` directory:
 ---
 
 ## Neovim / CLI Workflow
-Because we use a "Search-First" naming convention (`<app>-rt.yaml`), we maintain high velocity:
+Because I use a "Search-First" naming convention (`<app>-rt.yaml`), we maintain high velocity:
 * **Fuzzy Find:** `<leader>ff` -> `link rt` (Instantly find Linkding routes).
 * **Television (CLI):** `tv -e yaml linkding` (List all manifests for the app).

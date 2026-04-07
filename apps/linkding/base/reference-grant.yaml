@@ -1,0 +1,14 @@
+# ./apps/linkding/base/reference-grant.yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-internal-gateway
+  namespace: linkding
+spec:
+  from: # The SOURCE (Who is sending the traffic?)
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      namespace: traefik
+  to: # The TARGET (Where is it going?)
+    - group: ""
+      kind: Service

@@ -24,6 +24,7 @@ atuin = "18.13.5"
 "aqua:BurntSushi/ripgrep" = "15.1.0"
 "aqua:google/go-containerregistry" = "latest"
 "aqua:alexpasmantier/television" = "latest"
+"github:cilium/hubble" = "latest"
 
 # This globally masks any variable ending in _TOKEN in mise output
 

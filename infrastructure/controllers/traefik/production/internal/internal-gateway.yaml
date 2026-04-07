@@ -4,8 +4,9 @@ metadata:
   name: internal-gateway
   namespace: traefik
   labels:
-    gateway: internal
-    io.kubernetes.protocol/gateway: "true" # The key that unlocks the CCNP egress
+    # Standardized Taxonomy
+    networking.athanor.local/role: gateway
+    networking.athanor.local/zone: internal
 spec:
   gatewayClassName: traefik-internal
   listeners:
@@ -32,5 +33,4 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: athanor-wildcard-cert # This will be created later with Cert-Manager
-
+          - name: athanor-wildcard-cert

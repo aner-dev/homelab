@@ -1,11 +1,10 @@
-# --- Basic/Global Configuration ---
 # Prioritizing modern TLS and explicit IP versioning
 minTlsServeVersion: 1.3
 connectIPVersion: v4
 
 # --- Ports & Addresses ---
-# Using the Gateway API persona model:
-# The Infrastructure Provider (you) defines where the 'river' starts.
+# relying on the Gateway API persona model:
+# The Infrastructure Provider defines where the 'river' starts.
 ports:
   dns: 53
   tls: 853
@@ -15,10 +14,10 @@ certFile: /etc/blocky/certs/tls.crt
 keyFile: /etc/blocky/certs/tls.key
 
 # --- Logging Configuration ---
-# Structured logging
+# JSON/Structured logging
 log:
   level: info
-  format: json # Use 'json' to pipe logs to Loki/Grafana
+  format: json # pipe logs to Loki/Grafana
   timestamp: true
   privacy: false # Set to 'true' only if I need to hide the DNS history from logs
 

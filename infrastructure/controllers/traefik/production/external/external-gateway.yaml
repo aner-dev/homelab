@@ -4,8 +4,9 @@ metadata:
   name: external-gateway
   namespace: traefik
   labels:
-    gateway: external
-    io.kubernetes.protocol/gateway: "true" # The key that unlocks the CCNP egress
+    # Standardized Taxonomy
+    networking.athanor.local/role: gateway
+    networking.athanor.local/zone: external
 spec:
   gatewayClassName: traefik-external
   listeners:
@@ -33,5 +34,4 @@ spec:
             from: Selector
             selector:
               matchLabels:
-                # Refactored for consistency with your internal gateway
                 networking.athanor.local/external-gateway-access: "true"

@@ -30,17 +30,21 @@ spec:
   driftDetection:
     mode: enabled
   values:
+    deployment:
+      podLabels:
+        networking.athanor.local/role: gateway
+        networking.athanor.local/zone: internal # Adjust for your external instance
     service:
-  enabled: true
-  type: LoadBalancer
-  # The Label that connects Traefik to your 'home-lan-lb-pool'
-  labels:
-    io.cilium/ipam-pool: "lan-expose"
-  # The Annotation that "pins" the specific IP
-  annotations:
-    lbipam.cilium.io/ips: "192.168.1.192"
-  spec:
-    externalTrafficPolicy: Local # Preserves Client Source IP
+      enabled: true
+      type: LoadBalancer
+      # The Label that connects Traefik to your 'home-lan-lb-pool'
+      labels:
+        io.cilium/ipam-pool: "lan-expose"
+      # The Annotation that "pins" the specific IP
+      annotations:
+        lbipam.cilium.io/ips: "192.168.1.192"
+      spec:
+        externalTrafficPolicy: Local # Preserves Client Source IP
 
     providers:
       kubernetesCRD:
