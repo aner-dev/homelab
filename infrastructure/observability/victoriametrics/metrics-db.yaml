@@ -1,0 +1,27 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMSingle
+metadata:
+  name: athanor-metrics-db
+  namespace: observability
+spec:
+  image:
+    repository: victoriametrics/victoria-metrics
+    tag: v1.139.0
+  # imagePullSecrets:              # Uncomment once Harbor is operational
+  #   - name: harbor-pull-secret   # Created via: kubectl create secret docker-registry...
+  retentionPeriod: "1"
+  ingestOnlyMode: false
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: longhorn
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1000Mi"
+    requests:
+      cpu: "100m"
+      memory: "500Mi"

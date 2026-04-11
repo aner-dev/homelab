@@ -26,7 +26,7 @@ resource "vault_pki_secret_backend_root_cert" "root" {
 resource "vault_pki_secret_backend_role" "athanor_role" {
   backend          = vault_mount.pki.path
   name             = "athanor-dot-local"
-  ttl              = 86400 # 24 hours (Senior tip: short-lived certs are safer)
+  ttl              = 86400 # 24 hours (short-lived certs are safer)
   allow_ip_sans    = true
   key_type         = "rsa"
   key_bits         = 4096

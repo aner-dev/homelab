@@ -1,0 +1,26 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  name: athanor-agent
+  namespace: observability
+spec:
+  selectAllByDefault: true # Resource discovery across all namespaces
+
+  image:
+    repository: victoriametrics/vmagent
+    tag: v1.139.0 # Image alignment with 'athanor-metrics-db'
+
+  remoteWrite:
+    - url: "http://vmsingle-athanor-metrics-db.observability.svc:8428/api/v1/write"
+
+  # Resource Management
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+
+  # ReplicaCount: 1 instance should be enough for a single-node homelab
+  replicaCount: 1

@@ -1,0 +1,14 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: linkding-metrics
+  namespace: apps
+spec:
+  # This tells VM: "Look for the Endpoints object associated with this Service"
+  selector:
+    matchLabels:
+      app: linkding
+  endpoints:
+    - port: http # This is the name of the port in the Service spec
+      path: /metrics
+      interval: 30s

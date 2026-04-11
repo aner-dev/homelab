@@ -1,0 +1,14 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: ${CONTROLLER_NAME}-internal-policy
+  namespace: ${NAMESPACE}
+spec:
+  endpointSelector: {} # Applies to all pods in the namespace
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": ${NAMESPACE}
+  # Note: Ingress is usually not needed unless they expose a service (like the webhook)

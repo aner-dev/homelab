@@ -63,9 +63,11 @@ spec:
       pullPolicy: IfNotPresent
       tag: "1.45.0-plus"
 
-    # 4. Networking (Internal Port)
-    ports:
+    # 4. Service & Identity (Internal ClusterIP)
+    fullnameOverride: "linkding"
+    ports: # This creates the stable SSOT for VMAgent discovery and HTTPRoute backends.
       http:
+        enabled: true
         port: 9090
 
     # 5. Storage Logic

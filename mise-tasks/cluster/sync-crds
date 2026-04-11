@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# [MISE] description="Sync CRDs from Flux HelmReleases"
+set -euxo pipefail
+
+SEARCH_ROOT="infrastructure/controllers"
+DRY_RUN=true
+
+# Parse the flag to switch modes
+for arg in "$@"; do
+  case $arg in
+  --live)
+    DRY_RUN=false
+    shift
+    ;;
+  esac
+done
+
+# Main Loop: Identify HelmReleases
+fd -e yaml . "$SEARCH_ROOT" -E production -E staging | while read -r manifest; do
+
+  [[ "$manifest" == */base/* ]] || continue
+
+  KIND=$(yq eval '.kind' "$manifest")
+  [[ "$KIND" == "HelmRelease" ]] || continue
+
+  # 1. Extraction: Get pointer and chart details
+  POINTER_REF=$(yq eval '.spec.chart.spec.sourceRef.name' "$manifest")
+  CHART_NAME=$(yq eval '.spec.chart.spec.chart' "$manifest")
+  CHART_VER=$(yq eval '.spec.chart.spec.version' "$manifest")
+
+  REPO_URL=""
+
+  # 2. Detection: Use Process Substitution to find the Repo URL
+  while read -r repo_file; do
+    MATCH_URL=$(yq eval "select(.kind == \"HelmRepository\" and .metadata.name == \"$POINTER_REF\") | .spec.url" "$repo_file")
+    if [[ -n "$MATCH_URL" ]]; then
+      REPO_URL="$MATCH_URL"
+      break
+    fi
+  done < <(fd -p "base/.*\.yaml$" infrastructure/)
+
+  # 3. Validation: Ensure we found a source
+  if [[ -z "$REPO_URL" ]]; then
+    echo "Warning: No HelmRepository found for $POINTER_REF in $manifest"
+    continue
+  fi
+
+  # 4. Execution: Generate CRDs
+  TARGET_DIR=$(dirname "$manifest")
+  OUTPUT_FILE="$TARGET_DIR/crds.yaml"
+
+  if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY-RUN] Found $CHART_NAME ($CHART_VER). No files will be changed."
+    echo "[DRY-RUN] Would sync $CHART_NAME ($CHART_VER) from $REPO_URL into $OUTPUT_FILE"
+    # Test command validity without writing to disk
+    if [[ "$REPO_URL" == oci://* ]]; then
+      helm template "$REPO_URL/$CHART_NAME" --version "$CHART_VER" --set installCRDs=true >/dev/null
+    else
+      helm template "$CHART_NAME" --version "$CHART_VER" --repo "$REPO_URL" --set installCRDs=true >/dev/null
+    fi
+  else
+    echo "Syncing $CHART_NAME ($CHART_VER) from $REPO_URL..."
+    if [[ "$REPO_URL" == oci://* ]]; then
+      # OCI: Concatenated URI
+      helm template "$REPO_URL/$CHART_NAME" --version "$CHART_VER" --set installCRDs=true |
+        yq eval 'select(.kind == "CustomResourceDefinition")' - >"$OUTPUT_FILE"
+    else
+      # Traditional: Using --repo flag
+      helm template "$CHART_NAME" --version "$CHART_VER" --repo "$REPO_URL" --set installCRDs=true |
+        yq eval 'select(.kind == "CustomResourceDefinition")' - >"$OUTPUT_FILE"
+    fi
+    echo "Successfully synced: $OUTPUT_FILE"
+  fi
+
+done

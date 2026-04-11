@@ -1,0 +1,10 @@
+# infrastructure/controllers/victoriametrics/helm-repository.yaml
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: victoriametrics-oci
+  namespace: flux-system
+spec:
+  type: oci
+  interval: 24h
+  url: oci://ghcr.io/victoriametrics/helm-charts

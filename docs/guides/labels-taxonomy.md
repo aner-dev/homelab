@@ -33,7 +33,9 @@
 | :--- | :--- | :--- |
 | `athanor.io/network-zone` | `internal` | Used by Cilium Network Policies. |
 | `athanor.io/backup-policy` | `daily` | Triggers Longhorn/CNPG backup schedules. |
-
+|**`athanor.io/scrape`**|`true`|**Metrics:** Global trigger for `VMAgent` scrape.|
+|**`athanor.io/log-format`**|`json`|**Logs:** Instruction for `Loki` parsing.|
+|**`grafana_dashboard`**|`1`|**Dashboards:** Sidecar trigger for JSON import.|
 # 4. Implementation Examples
 ## A. Snippet Configuration (Neovim/JSON)
 - Use these snippets to automate the "Identity vs. Governance" split.
@@ -127,4 +129,10 @@ spec:
       athanor.io/network-zone: internal     # Functional (Cilium)
       athanor.io/backup-policy: daily       # Functional (CNPG)
 ```
+
+# observability layer labels 
+|**Key**|**Example**|**Logic**|
+|---|---|---|
+|`athanor.io/log-retention`|`14d`|**Logs:** Overrides default TTL for specific high-volume apps.|
+|`grafana_dashboard`|`1`|**Dashboards:** Sidecar trigger to import JSON from ConfigMaps.|
 

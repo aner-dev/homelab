@@ -19,3 +19,4 @@ age.agekey
 .mise.local.toml
 .env
 .kubeconfig
+mise.local.toml
