@@ -1,0 +1,28 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: victoriametrics-self-monitoring
+  namespace: observability
+spec:
+  # Scrape all namespaces that might have 'athanor.io/scrape' pods
+  namespaceSelector:
+    matchNames:
+      - observability
+  podMetricsEndpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+  # if I want to track a resource at a pod level I'll just add this label selector to one of its manifests.
+  selector:
+    matchLabels:
+      athanor.io/scrape: "true"
+
+  # previous implementation: hardcoded values as label selectors
+  #
+  #selector:
+  #  matchExpressions:
+  #    - key: app.kubernetes.io/name
+  #      operator: In
+  #      values:
+  #        - vmsingle
+  #        - vmagent

@@ -9,15 +9,20 @@ spec:
     matchLabels:
       app.kubernetes.io/name: linkding
   ingress:
-    - fromEndpoints:
-        - matchLabels:
-            athanor.io/gateway-zone: internal
-      authentication:
-        mode: "required"
-      toPorts:
-        - ports:
-            - port: "9090"
-              protocol: TCP
+    ingress:
+      # 1. Allow the Gateway (User Traffic)
+      - fromEndpoints:
+          - matchLabels:
+              athanor.io/gateway-zone: internal
+        toPorts:
+          - ports: [{ port: "9090", protocol: TCP }]
+      # 2. Allow VictoriaMetrics (Scraping Traffic)
+      - fromEndpoints:
+          - matchLabels:
+              athanor.io/network-zone: observability
+        toPorts:
+          - ports: [{ port: "9090", protocol: TCP }]
+
   egress:
     # 1. Allow Database access
     - toEndpoints:
@@ -39,3 +44,11 @@ spec:
           rules:
             dns:
               - matchPattern: "*"
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

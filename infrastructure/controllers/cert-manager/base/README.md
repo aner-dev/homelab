@@ -25,4 +25,5 @@ The cluster utilizes **Publicly Trusted Certificates** (Let's Encrypt via deSEC)
 **Decision:** Leveraging "Split-Brain DNS" with **Blocky** allows us to use public certificates for private IPs, ensuring a seamless "Green Lock" experience on all devices without manual certificate trust management.
 
 # Issuer Redundancy
-The cluster implements a "Plug-and-Play" Issuer strategy. While deSEC is the primary provider for DNS-01 challenges, a Cloudflare ClusterIssuer is maintained as a fallback. This ensures high availability for TLS certificate renewals and prevents vendor lock-in.
+The cluster implements a "Plug-and-Play" Issuer strategy.
+While deSEC is the primary provider for DNS-01 challenges, a Cloudflare ClusterIssuer is maintained as a fallback. This ensures high availability for TLS certificate renewals and prevents vendor lock-in.

@@ -44,6 +44,9 @@ spec:
                   allowed_domains="athanor.local" \
                   allow_subdomains=true \
                   max_ttl=720h # 30 days for leaf certs (Senior/Security choice)
+
+              # 8. Inject the Public CA into the cluster for receivers to trust 
+              kubectl create configmap athanor-root-ca --from-file=ca.crt=/tmp/root_ca.crt -n cert-manager --dry-run=client -o yaml | kubectl apply -f -
           env:
             - name: BAO_TOKEN
               valueFrom:

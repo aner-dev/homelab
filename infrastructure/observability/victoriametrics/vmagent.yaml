@@ -3,6 +3,9 @@ kind: VMAgent
 metadata:
   name: athanor-agent
   namespace: observability
+commonMetadata:
+  labels:
+    athanor.io/network-zone: observability # <- New dedicated zone
 spec:
   selectAllByDefault: true # Resource discovery across all namespaces
 

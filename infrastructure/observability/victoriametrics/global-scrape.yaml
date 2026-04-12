@@ -1,0 +1,15 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: athanor-autoscrape
+  namespace: observability
+spec:
+  # This targets ANY service with the scrape label
+  selector:
+    matchLabels:
+      athanor.io/scrape: "true"
+  endpoints:
+    - port: "http" # Common for Linkding
+      path: /metrics
+    - port: "metrics" # Common for exporters/Go apps
+      path: /metrics

@@ -36,6 +36,10 @@
 |**`athanor.io/scrape`**|`true`|**Metrics:** Global trigger for `VMAgent` scrape.|
 |**`athanor.io/log-format`**|`json`|**Logs:** Instruction for `Loki` parsing.|
 |**`grafana_dashboard`**|`1`|**Dashboards:** Sidecar trigger for JSON import.|
+|**`athanor.io/scrape-port`**|`9090`|**Metrics:** Tells VM exactly which port to hit if it's non-standard.|
+|**`athanor.io/telemetry-path`**|`/metrics`|**Metrics:** If an app uses a non-standard path (like `/stats`).|
+|**`athanor.io/network-zone`**|`observability`|**Networking:** Identifies monitoring components in Cilium.|
+
 # 4. Implementation Examples
 ## A. Snippet Configuration (Neovim/JSON)
 - Use these snippets to automate the "Identity vs. Governance" split.
