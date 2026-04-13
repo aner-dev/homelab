@@ -4,7 +4,7 @@ metadata:
   name: athanor-autoscrape
   namespace: observability
 spec:
-  # This targets ANY service with the scrape label
+  # use a `label selector` to attach the creation of an scrape at the application level
   selector:
     matchLabels:
       athanor.io/scrape: "true"

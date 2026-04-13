@@ -1,0 +1,19 @@
+# infrastructure/configs/observability/cadvisor-scrape.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMNodeScrape
+metadata:
+  name: cadvisor-metrics
+  labels:
+    athanor.io/managed-by: "flux"
+spec:
+  # The Kubelet usually listens on 10250 with HTTPS
+  scheme: "https"
+  path: /metrics/cadvisor
+  tlsConfig:
+    insecureSkipVerify: true # K3s often uses self-signed certs for kubelet
+  bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+  relabelConfigs:
+    - action: labelmap
+      regex: __meta_kubernetes_node_label_(.+)
+    - target_label: job
+      replacement: cadvisor
