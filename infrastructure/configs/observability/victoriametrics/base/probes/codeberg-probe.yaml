@@ -1,0 +1,16 @@
+# infrastructure/configs/observability/victoriametrics/probes/codeberg-check.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMProbe
+metadata:
+  name: codeberg-monitor
+spec:
+  jobName: codeberg-external-check
+  vmProberSpec:
+    # This is your "Interrogator" pod
+    url: blackbox-exporter.monitoring.svc.cluster.local:9115
+  module: http_2xx
+  targets:
+    staticConfig:
+      targets:
+        - https://codeberg.org
+        - https://github.com

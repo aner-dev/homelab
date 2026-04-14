@@ -1,12 +1,20 @@
-# vmagent.yaml
-## concepts
-|**Process Step**|**Action by the Operator**|**Audit Question**|
-|---|---|---|
-|**Discovery**|Checks for `VMServiceScrape` objects across the cluster.|Does the Agent have the RBAC permissions to see other namespaces?|
-|**Filtering**|Applies your `Selectors` (e.g., `selectAllByDefault`).|Am I accidentally scraping system pods I don't need?|
-|**Generation**|Updates a `Secret` prefixed with `vmagent-athanor-agent`.|Did the configuration reload successfully after my last change?|
-|**Execution**|Mounts that secret into the `VMAgent` pod and starts scraping.|Is the Agent OOMKilled (Out of Memory) because of too many targets?|
-## cheatsheet
+# alerting stack 
+## `VMAlertmanager`
+- cluster-scoped resource
+- it will act as **the central notification hub** for the "Athanor" cluster.
+  - As long as the `VMAlert` instances are pointed at it, it will handle the routing, deduplication, and silencing for everything.
+    - Therefore it does not care if an alert comes from `node-exporter`, `postgres`, or a `mise-task` in that sense.
+### binary configuration file 
+- `alertmanager.yaml`: This is the internal configuration used by the actual Alertmanager binary.
+  - The `Operator` takes the logic I wrote in `configRawYaml` and automatically generates a `Secret` containing a file named `alertmanager.yaml`, then mounts it into the Pod for me.
+  - **is that `Secret` an standard K8s secret? YES**:
+    - technical plumbing: the Operator creates a standard Kubernetes Secret object (type `Opaque`).
+      - The Secret itself is named after the CRD (e.g., vmalertmanager-athanor-alertmanager-config), but the **Data Key** inside that Secret is named `alertmanager.yaml`.
+        - vm docs: "Generated config stored at Secret created by the operator, it has the following name template vmalertmanager-CRD_NAME-config."
+    - The Operator then tells the StatefulSet to **mount that secret as a volume (volume mounting).** 
+      - Mount Path: Usually ``/etc/alertmanager/config/``
+      - Resulting File: `/etc/alertmanager/config/alertmanager.yaml`
+## configuration fields (cheatsheet)
 |**Field**|**Purpose**|**Best Practices**|
 |---|---|---|
 |**`remoteWrite`**|Data Export|Always use the internal Kube-DNS cluster URL for latency and security.|
@@ -27,3 +35,7 @@
 ## `VMScrapeConfig` relevance 
 - While VMServiceScrape is easy and declarative, VMScrapeConfig allows me to write raw Prometheus-style scrape configurations.
 - I will likely need this only if you are integrating a legacy application or a tool that requires very specific Relabeling Configurations (changing label names on the fly before they hit the DB).
+# receivers 
+- FOSS tools & possible future deployments:
+  - [gotify](https://github.com/gotify/server)
+  - [ntfy](https://github.com/binwiederhier/ntfy)

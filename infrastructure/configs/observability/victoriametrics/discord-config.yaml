@@ -1,0 +1,18 @@
+# infrastructure/configs/observability/victoriametrics/discord-config.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanagerConfig
+metadata:
+  name: discord-notifications
+  namespace: observability
+  labels:
+    project: athanor
+spec:
+  receivers:
+    - name: "discord-notifications"
+      discord_configs:
+        - url: "https://discord.com/api/webhooks/1493720634893668362/-LglgLbPNS-gWIBJdIoUzgIuXTA-KbRNREniXEM5R7Xg_VMM9TgWwdSHdwnXkG1kWxbk"
+  route:
+    receiver: "discord-notifications"
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 12h

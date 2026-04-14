@@ -1,0 +1,12 @@
+# infrastructure/apps/linkding/alerts-config.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanagerConfig
+metadata:
+  name: linkding-alerts
+  namespace: linkding
+spec:
+  route:
+    receiver: "discord-notifications" # Using the cluster-scoped receiver for now
+    matchers:
+      - app="linkding"
+    group_by: ["instance"]
