@@ -13,7 +13,6 @@ vault = "1.21.2"
 yq = "4.52.2"
 "aqua:cilium/cilium-cli" = "0.19.2"
 regctl = "0.11.2"
-age = "1.3.1"
 sops = "3.12.2"
 act = "0.2.84"
 dive = "0.13.1"
@@ -57,3 +56,6 @@ dir = "{{config_root}}"
 [tasks.tldrb]
 description = "View tldr pages with bat coloring"
 run = "tldr $1 | bat"
+
+[settings.sops]
+age_key_file = "~/.config/sops/age/keys.txt"

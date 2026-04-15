@@ -8,11 +8,27 @@ metadata:
     project: athanor
 spec:
   receivers:
-    - name: "discord-notifications"
+    - name: discord-notifications
       discord_configs:
-        - url: "https://discord.com/api/webhooks/1493720634893668362/-LglgLbPNS-gWIBJdIoUzgIuXTA-KbRNREniXEM5R7Xg_VMM9TgWwdSHdwnXkG1kWxbk"
+        - url: ENC[AES256_GCM,data:zktEBfTTpjpvcGmGcNFw5wnBqZ3SFg7xbvUNgDmjiY1+B3Le46O5w+MglcHw68lEFWpe26Ym+uaHguIL5xfRFFaic7X/kXkvy08U4NEISCBfjTO/VPgAo0/dYbSDuITT5LImPNhXXn4caDmePN+oNEex6qPfMb153A==,iv:m7qX68U2IGuPM0VyQFUgrNCI9kB0hym1lq2+4eRbRuw=,tag:gLTqJOQLKnHGi4UZYhbuhQ==,type:str]
   route:
-    receiver: "discord-notifications"
+    receiver: discord-notifications
     group_wait: 30s
     group_interval: 5m
     repeat_interval: 12h
+sops:
+  age:
+    - recipient: age1q7jd7racnk2j9jpktgkvlvgyz2mdll424dd0prlzzc65q97lzsvqv9q74l
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCS0ZTMHZ4TlVJK2M2QnB6
+        QVBBLzliVDFWSFRwTGdsOERGeUltZjJBbkZrCjJFSVFxU3Q2QXFpYXhDZVdlT3VL
+        LzFoTS83QkpQV3JVZ1ZJTy9IdXdLUTQKLS0tIG9nNVhQQ2xYQTdCZU1BQnJBVG5y
+        cFV6MzNFR0UvMm1vMTZmMmNWQlJSYjAKV/07EfA5pWePrKMPxUiUS2PhM+KONhsM
+        0phMg44v2Jj+WmjRzs1f7QL0q04xChNGmPB5sIyDZ5pSvVaMf1vDKw==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-04-15T14:14:28Z"
+  mac: ENC[AES256_GCM,data:mHS9KRhZgWnlsqA+lEgilTHoji0jhiulFeJluUzg1YTN4om+5iCowesMkNjDuFMBi1NQZUH1TxNJEflRFZOVxv+64PcX+e89seC12f5Il9wG/2WBJ3h4uTbRggUkgVi/M/xRAsXwx3Gc0uvGV3LhxyhLzPWEDMFF9voWLeq8trA=,iv:asmHO4nNBVZEW9pvPD+f5JW+HAlGhtbRG0QcpPhSKyE=,tag:LiQ79qe0RmDUJTEAcZG5ow==,type:str]
+  encrypted_regex: ^(url)$
+  mac_only_encrypted: true
+  version: 3.12.2
