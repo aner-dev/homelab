@@ -4,7 +4,6 @@ metadata:
   name: internal-gateway
   namespace: traefik
   labels:
-    # Standardized Taxonomy
     networking.athanor.local/role: gateway
     networking.athanor.local/zone: internal
 spec:

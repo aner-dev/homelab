@@ -9,7 +9,7 @@ spec:
     tag: v1.139.0
   # imagePullSecrets:              # Uncomment once Harbor is operational
   #   - name: harbor-pull-secret   # Created via: kubectl create secret docker-registry...
-  retentionPeriod: "1"
+  retentionPeriod: "3"
   ingestOnlyMode: false
   storage:
     accessModes:

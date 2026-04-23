@@ -35,7 +35,7 @@ spec:
       create: true
     serviceAccount:
       create: true
-      automountServiceAccountToken: false # Hardened security
+      automountServiceAccountToken: false # K8S API communication isn't necessary (it just needs kernel communication)
 
     # --- Observability Meta ---
     releaseLabel: true

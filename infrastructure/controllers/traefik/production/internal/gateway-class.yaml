@@ -4,3 +4,4 @@ metadata:
   name: traefik-internal
 spec:
   controllerName: traefik.io/gateway-controller/internal
+  description: "gateway for the internal traffic & networking"

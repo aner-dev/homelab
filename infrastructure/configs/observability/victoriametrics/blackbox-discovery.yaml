@@ -1,0 +1,22 @@
+# infrastructure/configs/observability/blackbox-discovery.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMProbe
+metadata:
+  name: general-http-prober
+  namespace: observability
+spec:
+  # 1. The Logic: Which apps to probe?
+  jobName: "blackbox-dynamic-discovery"
+  vmServiceSelector:
+    matchLabels:
+      monitor: blackbox # <--- Any service with this label will be probed!
+
+  # 2. The Worker: Who does the probing?
+  prober:
+    url: blackbox-exporter.observability.svc.cluster.local:9115
+
+  # 3. The Module: How to probe?
+  module: http_2xx
+
+  # 4. Identity Theft (Relabeling): Ensure the 'instance' label is the App Name
+  targetLabels: [instance]

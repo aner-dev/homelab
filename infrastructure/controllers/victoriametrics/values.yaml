@@ -36,10 +36,10 @@ deployment:
   spec:
     # -- Deployment strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for details
     strategy: {}
-     # rollingUpdate:
-     #  maxSurge: 25%
-     #  maxUnavailable: 25%
-     # type: RollingUpdate
+      # rollingUpdate:
+      #  maxSurge: 25%
+      #  maxUnavailable: 25%
+      # type: RollingUpdate
 
 # -- [K8s StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) specific variables
 statefulSet:
@@ -50,8 +50,7 @@ statefulSet:
   replicationFactor: 1
   spec:
     # -- StatefulSet update strategy. Check [here](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies) for details.
-    updateStrategy: {}
-      # type: RollingUpdate
+    updateStrategy: {} # type: RollingUpdate
 
 image:
   # -- Image registry
@@ -108,8 +107,8 @@ serviceAccount:
   annotations: {}
   # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name:
-  # -- mount API token to pod directly
+  name: # -- mount API token to pod directly
+
   automountToken: true
 
 # -- See `kubectl explain poddisruptionbudget.spec` for more or check [official documentation](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
@@ -148,9 +147,8 @@ extraArgs:
   # opentsdbHTTPListenAddr: ":4242"
   # opentsdbListenAddr: ":4242"
 
-# -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/victoriametrics/#environment-variables) for more details.
-env:
-  []
+  # -- Additional environment variables (ex.: secret tokens, flags). Check [here](https://docs.victoriametrics.com/victoriametrics/#environment-variables) for more details.
+env: []
   # - name: VM_remoteWrite_basicAuth_password
   #   valueFrom:
   #     secretKeyRef:
@@ -158,8 +156,7 @@ env:
   #       key: password
 
 # -- Specify alternative source for env variables
-envFrom:
-  []
+envFrom: []
   #- configMapRef:
   #    name: special-config
 
@@ -173,8 +170,7 @@ podLabels: {}
 selectorLabels: {}
 
 # -- Additional hostPath mounts
-extraHostPathMounts:
-  []
+extraHostPathMounts: []
   # - name: certs-dir
   #   mountPath: /etc/kubernetes/certs
   #   subPath: ""
@@ -182,15 +178,13 @@ extraHostPathMounts:
   #   readOnly: true
 
 # -- Extra Volumes for the pod
-extraVolumes:
-  []
+extraVolumes: []
   # - name: example
   #   configMap:
   #     name: example
 
 # -- Extra Volume Mounts for the container
-extraVolumeMounts:
-  []
+extraVolumeMounts: []
   # - name: example
   #   mountPath: /example
 
@@ -199,9 +193,8 @@ extraContainers: []
 #   - name: config-reloader
 #     image: reloader-image
 
- # -- Init containers for vmagent
-initContainers:
-  []
+# -- Init containers for vmagent
+initContainers: []
   # - name: example
   #   image: example-image
 
@@ -210,7 +203,7 @@ podSecurityContext:
   enabled: true
   # fsGroup: 2000
 
-# -- Security context to be added to pod's containers
+  # -- Security context to be added to pod's containers
 securityContext:
   enabled: true
   # capabilities:
@@ -281,7 +274,7 @@ route:
 ingress:
   # -- Enable deployment of ingress for agent
   enabled: false
-  
+
   # -- Ingress annotations
   annotations: {}
   #   kubernetes.io/ingress.class: nginx
@@ -289,14 +282,14 @@ ingress:
 
   # -- Ingress extra labels
   extraLabels: {}
-  
+
   # -- Array of host objects
   hosts:
     - name: vmagent.local
       path:
-        - / 
+        - /
       port: http
-  
+
   # -- Array of TLS objects
   tls: []
   #   - secretName: vmagent-ingress-tls
@@ -310,8 +303,7 @@ ingress:
   pathType: Prefix
 
 # -- Resource object. Details are [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-resources:
-  {}
+resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -378,7 +370,7 @@ serviceMonitor:
   # tlsConfig:
   #   insecureSkipVerify: true
 
-# -- Empty dir configuration for a case, when persistence is disabled
+  # -- Empty dir configuration for a case, when persistence is disabled
 emptyDir: {}
 
 persistentVolume:
@@ -451,7 +443,7 @@ verticalPodAutoscaling:
   #         memory: 500Mi
   #       controlledResources: ["cpu", "memory"]
 
-# -- VMAgent scrape configuration
+  # -- VMAgent scrape configuration
 config:
   # -- Enable config templating
   useTpl: false
@@ -462,7 +454,6 @@ config:
     - job_name: vmagent
       static_configs:
         - targets: ["localhost:8429"]
-
       ## COPY from Prometheus helm chart https://github.com/helm/charts/blob/master/stable/prometheus/values.yaml
 
       # Scrape config for API servers.
@@ -576,7 +567,7 @@ config:
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
     # * `prometheus.io/port`: If the metrics are exposed on a different port to the
     # service then set this appropriately.
-    # 
+    #
     - job_name: "kubernetes-service-endpoints"
       kubernetes_sd_configs:
         - role: endpointslices
@@ -585,26 +576,23 @@ config:
           source_labels: [__meta_kubernetes_pod_container_init]
           regex: true
         - action: keep_if_equal
-          source_labels: [__meta_kubernetes_service_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
-        - source_labels:
-            [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+          source_labels:
+            [
+              __meta_kubernetes_service_annotation_prometheus_io_port,
+              __meta_kubernetes_pod_container_port_number,
+            ]
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
           action: keep
           regex: true
-        - source_labels:
-            [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
           action: replace
           target_label: __scheme__
           regex: (https?)
-        - source_labels:
-            [__meta_kubernetes_service_annotation_prometheus_io_path]
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
           action: replace
           target_label: __metrics_path__
           regex: (.+)
-        - source_labels:
-            [
-              __address__,
-              __meta_kubernetes_service_annotation_prometheus_io_port,
-            ]
+        - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
           action: replace
           target_label: __address__
           regex: ([^:]+)(?::\d+)?;(\d+)
@@ -648,26 +636,23 @@ config:
           source_labels: [__meta_kubernetes_pod_container_init]
           regex: true
         - action: keep_if_equal
-          source_labels: [__meta_kubernetes_service_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
-        - source_labels:
-            [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
+          source_labels:
+            [
+              __meta_kubernetes_service_annotation_prometheus_io_port,
+              __meta_kubernetes_pod_container_port_number,
+            ]
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
           action: keep
           regex: true
-        - source_labels:
-            [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
           action: replace
           target_label: __scheme__
           regex: (https?)
-        - source_labels:
-            [__meta_kubernetes_service_annotation_prometheus_io_path]
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
           action: replace
           target_label: __metrics_path__
           regex: (.+)
-        - source_labels:
-            [
-              __address__,
-              __meta_kubernetes_service_annotation_prometheus_io_port,
-            ]
+        - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
           action: replace
           target_label: __address__
           regex: ([^:]+)(?::\d+)?;(\d+)
@@ -702,8 +687,7 @@ config:
       kubernetes_sd_configs:
         - role: service
       relabel_configs:
-        - source_labels:
-            [__meta_kubernetes_service_annotation_prometheus_io_probe]
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
           action: keep
           regex: true
         - source_labels: [__address__]
@@ -735,7 +719,11 @@ config:
           source_labels: [__meta_kubernetes_pod_container_init]
           regex: true
         - action: keep_if_equal
-          source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port, __meta_kubernetes_pod_container_port_number]
+          source_labels:
+            [
+              __meta_kubernetes_pod_annotation_prometheus_io_port,
+              __meta_kubernetes_pod_container_port_number,
+            ]
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
           action: keep
           regex: true
@@ -743,8 +731,7 @@ config:
           action: replace
           target_label: __metrics_path__
           regex: (.+)
-        - source_labels:
-            [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
           action: replace
           regex: ([^:]+)(?::\d+)?;(\d+)
           replacement: $1:$2
@@ -762,7 +749,7 @@ config:
           target_label: node
       ## End of COPY
 
-# -- Extra scrape configs that will be appended to `config`
+      # -- Extra scrape configs that will be appended to `config`
 extraScrapeConfigs: []
 
 probe:
@@ -801,4 +788,3 @@ license:
     name: ""
     # -- Key in secret with license key
     key: ""
-
