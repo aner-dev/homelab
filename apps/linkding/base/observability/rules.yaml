@@ -1,0 +1,34 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: linkding-alerts
+  namespace: linkding
+  labels:
+    # This label must match the 'ruleSelector' in your VMAlert engine
+    role: alert-rules
+    athanor.io/managed-by: flux
+spec:
+  groups:
+    - name: linkding-health
+      interval: 30s
+      rules:
+        # 1. Availability Alert
+        - alert: LinkdingDown
+          expr: up{job="linkding"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Linkding instance is down"
+            description: "The Linkding pod in {{ $labels.namespace }} has been unreachable for more than 2 minutes."
+
+        # 2. Latency Alert (Performance)
+        - alert: LinkdingHighLatency
+          # Using MetricsQL: average request duration > 500ms over 5m
+          expr: job:http_request_duration_seconds:avg5m{job="linkding"} > 0.5
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Linkding latency is increasing"
+            description: "Linkding is responding slowly ({{ $value }}s) on instance {{ $labels.instance }}."

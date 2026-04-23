@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: linkding-hr
+  name: linkding
 spec:
   interval: 1h
   chart:
@@ -27,7 +27,6 @@ spec:
       kind: Cluster
       name: linkding-db
       namespace: linkding
-
     # 1. Controller Logic (Replicas & Resources)
   values:
     controller:
@@ -65,7 +64,13 @@ spec:
 
     # 4. Service & Identity (Internal ClusterIP)
     fullnameOverride: "linkding"
-    ports: # This creates the stable SSOT for VMAgent discovery and HTTPRoute backends.
+    service:
+      main:
+        # Most charts use 'main' or just 'service'
+        labels:
+          athanor.io/scrape: "true"
+    ports:
+      # This creates the stable SSOT for VMAgent discovery and HTTPRoute backends.
       http:
         enabled: true
         port: 9090
@@ -87,8 +92,8 @@ spec:
       - secretRef:
           name: linkding-env-secrets
     # 7. Labels
-    podLabels:
-    # 1. K8S STANDARDS (Identity)
+    podLabels: # 1. K8S STANDARDS (Identity)
+
     app.kubernetes.io/name: linkding
     app.kubernetes.io/component: app
     app.kubernetes.io/part-of: athanor-core
