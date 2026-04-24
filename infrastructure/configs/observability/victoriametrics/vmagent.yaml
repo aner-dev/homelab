@@ -7,7 +7,15 @@ commonMetadata:
   labels:
     athanor.io/network-zone: observability # <- New dedicated zone
 spec:
-  selectAllByDefault: true # Resource discovery across all namespaces
+  nodeScrapeSelector:
+    matchLabels:
+      athanor.io/managed-by: athanor-agent
+  serviceScrapeSelector:
+    matchLabels:
+      metrics.athanor.local/agent: metrics-agent
+  podScrapeSelector:
+    matchLabels:
+      metrics.athanor.local/agent: metrics-agent
 
   image:
     repository: victoriametrics/vmagent
@@ -15,6 +23,8 @@ spec:
 
   remoteWrite:
     - url: "http://vmsingle-athanor-metrics-db.observability.svc:8428/api/v1/write"
+      queues: 4
+      maxSamplesPerSend: 10000
 
   # Resource Management
   resources:

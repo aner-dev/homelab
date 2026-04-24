@@ -48,11 +48,18 @@ spec:
       mountPropagation: HostToContainer
     # --- Collectors Configuration & Flags ---
     extraArgs:
+      # check https://github.com/prometheus/node_exporter for the default enable list
       - --path.rootfs=/host
       - --collector.nvme
       - --collector.hwmon
+      # New: Monitor your Integrated Radeon Graphics
+      - --collector.drm
+      # New: Monitor process count and states
+      - --collector.processes
       # Exclude the "junk" virtual mounts created by k8s/containerd
       - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
       # Disable collectors that don't apply to a desktop/server build
       - --no-collector.wifi
       - --no-collector.zfs
+      # Disable systemd explicitly since I use OpenRC
+      - --no-collector.systemd

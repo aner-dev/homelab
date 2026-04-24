@@ -1,4 +1,10 @@
 # alerting stack 
+## pending CRDs manifests
+- `vmauth`: This is an Application Proxy.
+  It lives behind your Gateway. You use it only if you want to say: "User A can only read metrics from Namespace X, but User B can read everything." 
+  - **Decision**: Stick with Gateway API + Cilium. Only add `vmauth `if you need complex, user-based permission logic inside the metrics app itself.
+- `vmgateway`: This is for **Multi-tenancy**.
+  - If you aren't selling "Metrics-as-a-Service" to other people, you do not need this.
 ## `VMAlertmanager`
 - cluster-scoped resource
 - it will act as **the central notification hub** for the "Athanor" cluster.

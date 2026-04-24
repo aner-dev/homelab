@@ -4,17 +4,19 @@ kind: VMNodeScrape
 metadata:
   name: node-exporter
   namespace: observability
+  labels:
+    metrics.athanor.local/agent: metrics-agent
 spec:
   # This tells VMAgent to find nodes that are "Ready"
   selector:
     matchLabels:
       kubernetes.io/os: linux
-  # The path where node-exporter serves data
   path: /metrics
-  # Port 9100 (which you defined in your HelmRelease)
-  port: "9100"
+  port: "9100" # defined in HelmRelease
   interval: 30s
   relabelConfigs:
-    # Senior Habit: Rename the 'instance' from the internal IP to the actual Node Name
     - sourceLabels: [__meta_kubernetes_node_name]
       targetLabel: instance
+      action: replace
+    - targetLabel: job
+      replacement: node-exporter

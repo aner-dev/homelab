@@ -3,12 +3,32 @@ kind: VMServiceScrape
 metadata:
   name: linkding-metrics
   namespace: apps
+  labels:
+    metrics.athanor.local/agent: metrics-agent
 spec:
-  # This tells VM: "Look for the Endpoints object associated with this Service"
   selector:
+    # This tells VM: "Look for the Endpoints object associated with this Service"
     matchLabels:
       app: linkding
   endpoints:
     - port: http # This is the name of the port in the Service spec
       path: /metrics
       interval: 30s
+      # --- SERVICE DISCOVERY RELABELING ---
+      relabelConfigs:
+        # 1. ENFORCE THE JOB NAME:
+        # this is done by default by the VMAgent but I'll declare it anyways.
+        - targetLabel: job
+          replacement: linkding
+          action: replace
+
+        # 2. RENAME INSTANCE:
+        # By default, instance is often 'IP:Port' (e.g., 10.42.0.15:9100).
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: instance
+          action: replace
+
+        # 3. ADD NAMESPACE CONTEXT:
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: kubernetes_namespace
+          action: replace
