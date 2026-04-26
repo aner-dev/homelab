@@ -56,3 +56,12 @@ Decoupling ensures that two system components exist and function independently:
 
 # Resources Management
 For a Python/Django application like Linkding, memory management is key. Python processes can have "spiky" memory usage during heavy indexing.
+
+# observability
+## tips for metric relabeling
+- **Metric relabeling** can be debugged on the `http://vmagent:8429/metric-relabel-debug` page. 
+- All labels that start with the __ prefix are automatically removed from metrics after relabeling.
+  - It is common practice to store temporary labels with names starting with __ during metrics relabeling.
+- All target-level labels are automatically added to all metrics scraped from targets, making them available during metrics relabeling.
+- If too many labels are removed, different metrics might look the same — this can lead to duplicate time series with conflicting values, which is usually a problem.
+

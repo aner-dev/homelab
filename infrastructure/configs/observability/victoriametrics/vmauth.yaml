@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/operator.victoriametrics.com/vmauth_v1beta1.json
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: athanor-auth-proxy
+  namespace: observability
+spec:
+
+  selectAllByDefault: true # I will use the observability namespace only
+
+  userSelector:
+    matchLabels:
+      project: athanor
+  replicaCount: 1
+  useStrictSecurity: true

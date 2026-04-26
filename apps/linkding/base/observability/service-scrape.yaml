@@ -17,18 +17,21 @@ spec:
       # --- SERVICE DISCOVERY RELABELING ---
       relabelConfigs:
         # 1. ENFORCE THE JOB NAME:
-        # this is done by default by the VMAgent but I'll declare it anyways.
         - targetLabel: job
           replacement: linkding
           action: replace
 
-        # 2. RENAME INSTANCE:
-        # By default, instance is often 'IP:Port' (e.g., 10.42.0.15:9100).
-        - sourceLabels: [__meta_kubernetes_pod_name]
+        - sourceLabels: [__meta_kubernetes_pod_name] # By default, 'instance' is often 'IP:Port' (e.g., 10.42.0.15:9100).
           targetLabel: instance
           action: replace
 
-        # 3. ADD NAMESPACE CONTEXT:
         - sourceLabels: [__meta_kubernetes_namespace]
           targetLabel: kubernetes_namespace
           action: replace
+
+      # --- STAGE 2: METRIC RELABELING ---
+      metricRelabelConfigs:
+        # Drop high-cardinality Go/Prometheus internal metrics
+        - sourceLabels: [__name__]
+          regex: '^(go_|promhttp_).*'
+          action: drop
