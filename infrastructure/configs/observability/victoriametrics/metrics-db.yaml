@@ -11,6 +11,8 @@ spec:
   #   - name: harbor-pull-secret   # Created via: kubectl create secret docker-registry...
   retentionPeriod: "3"
   ingestOnlyMode: false
+
+  # STORAGE MANAGEMENT
   storage:
     accessModes:
       - ReadWriteOnce
@@ -18,6 +20,20 @@ spec:
       requests:
         storage: 20Gi
     storageClassName: longhorn
+
+  vmBackup:
+    # Point this to RustFS S3 bucket
+    destination: "s3://backups/athanor-metrics"
+    # This refers to the 'target' name in the ExternalSecret
+    credentialsSecret:
+      name: vm-auth-credentials
+      key: RUSTFS_S3_CONFIG
+
+    customArgs:
+      - "-s3.endpoint=http://rustfs-service.rustfs-namespace.svc.cluster.local:\
+        9000"
+      - "-s3.forcePathStyle=true" # Often needed for self-hosted S3 like RustFS
+
   resources:
     limits:
       cpu: "500m"
