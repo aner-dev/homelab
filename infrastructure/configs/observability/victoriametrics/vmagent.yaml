@@ -5,7 +5,7 @@ metadata:
   namespace: observability
 commonMetadata:
   labels:
-    athanor.io/network-zone: observability # <- New dedicated zone
+    athanor.io/network-zone: observability
 spec:
   disableAutomountServiceAccountToken: true
 
@@ -64,5 +64,5 @@ spec:
       cpu: "200m"
       memory: "256Mi"
 
-  # ReplicaCount: 1 instance should be enough for a single-node homelab
+  # 1 instance should be enough for a single-node homelab
   replicaCount: 1

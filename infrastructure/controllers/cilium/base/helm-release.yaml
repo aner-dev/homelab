@@ -27,7 +27,8 @@ spec:
     # --- Policy Logic  ---
     kubeProxyReplacement: true
     policyDenyResponse: "icmp" # communication feedback loop logic
-    policyEnforcementMode: "default"
+    policy-deny-response: "none"
+    enable-policy: "default"
 
     # --- IPAM / Networking ---
     ipam:
@@ -55,6 +56,10 @@ spec:
     # --- Operator Config ---
     operator:
       replicas: 1
+
+    # --- eBPF Config --- 
+    bpf:
+      preallocateMaps: true
 
     # --- Service Mesh ---
     l7Proxy: true # Envoy proxy

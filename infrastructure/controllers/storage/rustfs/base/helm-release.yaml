@@ -1,0 +1,53 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rustfs
+  namespace: storage
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: rustfs
+      version: ">=1.0.0-alpha.0" # Aligns with the alpha versions mentioned in your docs
+      sourceRef:
+        kind: HelmRepository
+        name: rustfs
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    # --- Mode Selection ---
+    mode:
+      standalone:
+        enabled: true
+      distributed:
+        enabled: false
+    config:
+      rustfs:
+        volumes: "/data" # Standard persistence path
+        region: "homelab-brazil" # Essential for S3/SDK compatibility
+        log_level: "info"
+    secret:
+      existingSecret: "rustfs-credentials" # references the external-secret.yaml
+
+    podSecurityContext:
+      fsGroup: 10001
+    # --- Persistence (Persona: Cluster Operator) ---
+    storageclass:
+      name: "longhorn"
+      dataStorageSize: "100Gi"
+      logStorageSize: "1Gi"
+
+    # --- Networking (Persona: Infrastructure Provider) ---
+    gatewayApi:
+      enabled: true
+    ingress:
+      enabled: false
+
+    # --- Performance ---
+    replicaCount: 1

@@ -21,23 +21,19 @@ spec:
         storage: 20Gi
     storageClassName: longhorn
 
-  vmBackup:
-    # Point this to RustFS S3 bucket
-    destination: "s3://backups/athanor-metrics"
-    # This refers to the 'target' name in the ExternalSecret
-    credentialsSecret:
-      name: vm-auth-credentials
-      key: RUSTFS_S3_CONFIG
-
-    customArgs:
-      - "-s3.endpoint=http://rustfs-service.rustfs-namespace.svc.cluster.local:\
-        9000"
-      - "-s3.forcePathStyle=true" # Often needed for self-hosted S3 like RustFS
+  extraArgs:
+    snapshotAuthKey: "your-secret-key-here"
+  vmConfigs:
+    - name: VM_SNAPSHOT_AUTH_KEY
+      valueFrom:
+        secretKeyRef:
+          name: vm-auth-credentials
+          key: VM_SNAPSHOT_AUTH_KEY
 
   resources:
-    limits:
-      cpu: "500m"
-      memory: "1000Mi"
     requests:
-      cpu: "100m"
-      memory: "500Mi"
+      cpu: "250m"
+      memory: "64Mi"
+    limits:
+      memory: "128Mi"
+      cpu: "500m"

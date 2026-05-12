@@ -1,0 +1,30 @@
+# teller.yaml
+project: athanor
+
+providers:
+  # 'openbao' is just a name I chose for this provider instance
+  openbao:
+    kind: hashicorp
+    config:
+      # These use the get_env helper to pull from my local mise/shell environment
+      address: {? {get_env(name="VAULT_ADDR", default="http://127.0.0.1:8200")}}
+      token: {? {get_env(name="VAULT_TOKEN")}}
+    maps:
+      - id: storage-secrets
+        # OpenBao KV v2 usually requires the 'data' segment in the path via API
+        path: secret/data/athanor/storage/rustfs
+        keys:
+          # Left: Key in OpenBao | Right: Name of the Env Var in the shell
+          access_key: AWS_ACCESS_KEY_ID
+          secret_key: AWS_SECRET_ACCESS_KEY
+
+      - id: linkding-secrets
+        path: secret/data/apps/linkding/production
+        keys:
+          admin_password: LINKDING_ADMIN_PASSWORD
+
+      - id: desec-secrets
+        path: secret/data/athanor/desec
+        keys:
+          # '==' means keep the same name as the key in OpenBao
+          api-token: ==

@@ -16,7 +16,7 @@ spec:
   data:
     - secretKey: LD_DATABASE_URL
       remoteRef:
-        key: secret/data/apps/linkding # this follows the openbao naming convention for secret storage
+        key: apps/production/linkding
         property: db_url
 ```
 ## The Problem: Bespoke Resource Naming

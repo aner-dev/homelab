@@ -1,4 +1,4 @@
-kpiVersion: "cilium.io/v2"
+apiVersion: "cilium.io/v2"
 kind: CiliumClusterwideNetworkPolicy
 metadata:
   name: "global-zero-trust-baseline"
