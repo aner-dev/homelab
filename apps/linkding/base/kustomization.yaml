@@ -2,13 +2,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Resources defines WHAT is in the app
+# ./base/kustomization.yaml
 resources:
-  - database.yaml
-  - external-secret.yaml
-  - helm-repository.yaml
-  - helm-release.yaml
-  - httproute.yaml
+  - ../base
 
 # Identity defines WHO the app is (Stable for Selectors)
 commonLabels:

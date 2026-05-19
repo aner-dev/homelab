@@ -1,0 +1,62 @@
+apiVersion: helmb.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: velero
+  namespace: velero
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: velero
+      version: "7.1.0" # Match with Velero v1.14/v1.15 logic
+      sourceRef:
+        kind: HelmRepository
+        name: vmware-tanzu
+        namespace: flux-system
+  values:
+    # Use the Kopia uploader 
+    configuration:
+      uploaderType: kopia
+
+      # 2. Define your Rustfs S3 Storage
+      backupStorageLocation:
+        - name: default
+          provider: aws # Rustfs is S3-compatible
+          bucket: velero-backups
+          config:
+            region: minio # Rustfs often uses minio or global as region
+            s3ForcePathStyle: true
+            s3Url: http://s3.athanor.home # Your internal Rustfs endpoint
+
+      # 3. Enable CSI for Longhorn snapshots
+      features: EnableCSI
+
+    # 4. Install the required Plugins
+    initContainers:
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.10.0
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+      - name: velero-plugin-for-csi
+        image: velero/velero-plugin-for-csi:v1.10.0
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+
+    # 5. Resource requests for your Ryzen 5 5600GT
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+
+    # 6. Credentials Secret
+    credentials:
+      secretContents:
+        cloud: |
+          [default]
+          aws_access_key_id = <YOUR_KEY>
+          aws_secret_access_key = <YOUR_SECRET>

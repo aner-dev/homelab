@@ -27,8 +27,9 @@ spec:
       kind: Cluster
       name: linkding-db
       namespace: linkding
-    # 1. Controller Logic (Replicas & Resources)
+
   values:
+    # 1. Controller Logic (Replicas & Resources)
     controller:
       type: deployment
       replicas: 1
@@ -65,15 +66,17 @@ spec:
     # 4. Service & Identity (Internal ClusterIP)
     fullnameOverride: "linkding"
     service:
-      main:
-        # Most charts use 'main' or just 'service'
-        labels:
-          athanor.io/scrape: "true"
+      enabled: true
+      type: "ClusterIP"
+      labels:
+        athanor.io/scrape: "true"
+
     ports:
       # This creates the stable SSOT for VMAgent discovery and HTTPRoute backends.
       http:
         enabled: true
         port: 9090
+        protocol: "TCP"
 
     # 5. Storage Logic
     persistentVolumeClaim:
