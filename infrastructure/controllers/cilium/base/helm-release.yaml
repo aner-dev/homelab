@@ -21,7 +21,7 @@ spec:
     remediation:
       retries: 3
   values:
-    # --- install CRDs ---
+    # --- CRDs management (avoid installing them) ---
     crd:
       enabled: false
     # --- Policy Logic  ---
@@ -37,7 +37,7 @@ spec:
         clusterPoolIPv4PodCIDRList: ["10.42.0.0/16"]
     routingMode: native
     autoDirectNodeRoutes: true
-    ipv4NativeRoutingCIDR: "10.42.0.0/16"
+    ipv4NativeRoutingCIDR: "192.168.100.239/24"
 
     # --- L2 & Gateway API (The New Foundation) ---
     gatewayAPI:

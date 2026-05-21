@@ -10,3 +10,6 @@ resources:
 commonLabels:
   app.kubernetes.io/name: linkding
   app.kubernetes.io/part-of: athanor-core
+
+labels:
+  - includeSelectors:
