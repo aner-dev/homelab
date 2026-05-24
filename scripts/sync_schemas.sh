@@ -42,6 +42,10 @@ declare -A SCHEMAS=(
   ["cilium-ccnp.json"]="https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumclusterwidenetworkpolicy_v2.json"
   ["cilium-ippool.json"]="https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliumloadbalancerippool_v2alpha1.json"
   ["cilium-l2policy.json"]="https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cilium.io/ciliuml2announcementpolicy_v2alpha1.json"
+
+  # Headscale Operator Matrix
+  ["headscale-user.json"]="https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/headscale.infrado.cloud/headscaleuser_v1alpha1.json"
+  ["headscale-preauthkey.json"]="https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/headscale.infrado.cloud/headscalepreauthkey_v1alpha1.json"
 )
 
 for FILE in "${!SCHEMAS[@]}"; do

@@ -57,7 +57,7 @@ spec:
     operator:
       replicas: 1
 
-    # --- eBPF Config --- 
+    # --- eBPF Config ---
     bpf:
       preallocateMaps: true
 
@@ -75,7 +75,8 @@ spec:
     # Wireguard
     encryption:
       enabled: true
-      type: wireguard # section moved to a future configuration (mTLS SPIFFE/SPIRE based)
+      type: wireguard
+    # section moved to a future configuration (mTLS SPIFFE/SPIRE based)
     # 4. Enable Mutual Authentication (security)
     # This will eventually link to an OpenBao/SPIRE setup
     # authentication:

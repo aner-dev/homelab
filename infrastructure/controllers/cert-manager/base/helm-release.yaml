@@ -22,6 +22,12 @@ spec:
     crds: Skip
   values:
     installCRDs: false
+    # monitoring (victoriametrics)
+    prometheus:
+      enabled: true
+      podmonitor:
+        enabled: true
+
     replicaCount: 1 # Production usually uses 3
     extraArgs:
       - --enable-gateway-api

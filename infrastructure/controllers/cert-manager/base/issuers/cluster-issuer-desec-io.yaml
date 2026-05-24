@@ -10,12 +10,10 @@ spec:
     email: n0amh4w8@anonaddy.me
     privateKeySecretRef:
       name: letsencrypt-desec-account-key
-    profile: classic
     solvers:
-      - selector:
-        dnsNames:
-          - "*.yourdomain.com"
-          - "yourdomain.com"
+      - selectors:
+          matchLabels:
+            use-dns01-solver: "true"
         dns01:
           webhook:
             groupName: acme.desec.io
@@ -25,7 +23,10 @@ spec:
                 name: desec-api-token
                 key: api-token
       # FALLBACK/GENERIC: HTTP-01 for everything else
-      - http01:
+      - selectors:
+          matchLabels:
+            use-http01-solver: "true"
+        http01:
           gatewayHTTPRoute:
             parentRefs:
               - name: traefik-gateway
