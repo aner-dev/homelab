@@ -5,7 +5,7 @@ metadata:
   name: node-exporter
   namespace: observability
   labels:
-    metrics.athanor.local/agent: metrics-agent
+    metrics.athanor.local/agent: vmagent
 spec:
   # This tells VMAgent to find nodes that are "Ready"
   selector:

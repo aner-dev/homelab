@@ -1,4 +1,4 @@
-# Default values for victoria-metrics-agent.
+# Default values for victoria-vmagent.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:

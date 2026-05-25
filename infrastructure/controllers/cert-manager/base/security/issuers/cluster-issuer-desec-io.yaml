@@ -29,7 +29,7 @@ spec:
         http01:
           gatewayHTTPRoute:
             parentRefs:
-              - name: traefik-gateway
+              - name: external-gateway
                 namespace: traefik
                 kind: Gateway
             serviceType: ClusterIP

@@ -23,6 +23,9 @@ spec:
 
   extraArgs:
     snapshotAuthKey: "your-secret-key-here"
+    dedup.minScrapeInterval: 30s
+
+  # CREDENTIALS (secrets)
   vmConfigs:
     - name: VM_SNAPSHOT_AUTH_KEY
       valueFrom:
@@ -30,6 +33,7 @@ spec:
           name: vm-auth-credentials
           key: VM_SNAPSHOT_AUTH_KEY
 
+  # RESOURCES MANAGEMENT
   resources:
     requests:
       cpu: "250m"

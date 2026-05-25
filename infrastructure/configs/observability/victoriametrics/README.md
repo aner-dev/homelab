@@ -1,3 +1,5 @@
+# labels & naming conventions 
+
 # alerting stack 
 ## pending CRDs manifests
 - `vmauth`: This is an Application Proxy.

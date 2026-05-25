@@ -5,7 +5,7 @@ metadata:
   name: cadvisor-metrics
   namespace: observability
   labels:
-    athanor.io/managed-by: "metrics-agent"
+    athanor.io/managed-by: "vmagent"
 spec:
   # The Kubelet usually listens on 10250 with HTTPS
   scheme: "https"

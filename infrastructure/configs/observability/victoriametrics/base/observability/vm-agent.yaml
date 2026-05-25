@@ -7,17 +7,6 @@ commonMetadata:
   labels:
     athanor.io/network-zone: observability
 spec:
-  # TARGETS (Label Selectors)
-  nodeScrapeSelector:
-    matchLabels:
-      athanor.io/managed-by: vmagent
-  serviceScrapeSelector:
-    matchLabels:
-      metrics.athanor.local/agent: vmagent
-  podScrapeSelector:
-    matchLabels:
-      metrics.athanor.local/agent: vmagent
-
   disableAutomountServiceAccountToken: true
 
   # SIGNATURE: Added to every metric automatically
@@ -34,6 +23,16 @@ spec:
     promscrape.dropOriginalLabels: "true" # Saves RAM in K8s environments
     # memory.allowedBytes is handled automatically by the 'resources' limits below
     reloadAuthKey: "athanor-secret-key-123"
+    # TARGETS
+  nodeScrapeSelector:
+    matchLabels:
+      athanor.io/managed-by: vmagent
+  serviceScrapeSelector:
+    matchLabels:
+      metrics.athanor.local/agent: vmagent
+  podScrapeSelector:
+    matchLabels:
+      metrics.athanor.local/agent: vmagent
 
   # DESTINATION
   remoteWrite:
@@ -42,8 +41,6 @@ spec:
       send_labels: true
       maxSamplesPerSend: 10000
       queues: 2
-
-  # STORAGE
   # BUFFERING temporal storage (connection looses events)
   statefulStorage:
     volumeClaimTemplate:
@@ -54,10 +51,9 @@ spec:
           requests:
             storage: 2Gi # Small buffer is enough for homelab
 
-  # VERSIONING
   image:
     repository: victoriametrics/vmagent
-    tag: v1.139.0
+    tag: v1.139.0 # Image alignment with 'athanor-metrics-db'
 
   # RESOURCE MANAGEMENT (GOMAXPROCS Logic) <- see vm docs
   resources:
@@ -68,5 +64,5 @@ spec:
       cpu: "200m"
       memory: "256Mi"
 
-  # 1 agent instance should be enough for a single-node homelab
-  replicaCount: 1 # N agents-per-N nodes logic
+  # 1 instance should be enough for a single-node homelab
+  replicaCount: 1

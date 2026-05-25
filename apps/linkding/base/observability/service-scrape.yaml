@@ -1,10 +1,10 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: linkding-metrics
+  name: linkding-scrape
   namespace: apps
   labels:
-    metrics.athanor.local/agent: metrics-agent
+    metrics.athanor.local/agent: vmagent
 spec:
   selector:
     # This tells VM: "Look for the Endpoints object associated with this Service"
@@ -33,5 +33,5 @@ spec:
       metricRelabelConfigs:
         # Drop high-cardinality Go/Prometheus internal metrics
         - sourceLabels: [__name__]
-          regex: '^(go_|promhttp_).*'
+          regex: "^(go_|promhttp_).*"
           action: drop

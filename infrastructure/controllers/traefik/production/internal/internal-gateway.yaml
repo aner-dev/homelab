@@ -17,8 +17,8 @@ spec:
           from: Selector
           selector:
             matchLabels:
-              # Only namespaces with this label can attach to this Gateway
-              networking.athanor.local/internal-gateway-access: "true"
+              # Refactored: Intent-based value
+              networking.athanor.local/attached-gateway: "internal"
     - name: websecure
       protocol: HTTPS
       port: 443

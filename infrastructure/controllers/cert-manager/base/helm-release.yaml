@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: "v1.19.x" # Using a semver range is a Senior practice for auto-updates
+      version: "v1.20.x"
       sourceRef:
         kind: HelmRepository
         name: jetstack
@@ -27,10 +27,15 @@ spec:
       enabled: true
       podmonitor:
         enabled: true
+        # Explicitly align the endpoint configuration to prevent discovery drops
+        interval: 30s
+        scrapeTimeout: 10s
 
     replicaCount: 1 # Production usually uses 3
-    extraArgs:
-      - --enable-gateway-api
+    config:
+      enableGatewayAPI: true
+    # Enabling specific Feature Gates using structured fields
+    featureGates: "AdditionalCertificateOutputFormats=true,ServerSideApply=true"
 
     # Enabling specific Feature Gates
     featureGates: "AdditionalCertificateOutputFormats=true,ServerSideApply=true"

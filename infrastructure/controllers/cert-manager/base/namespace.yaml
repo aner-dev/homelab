@@ -4,3 +4,4 @@ metadata:
   name: cert-manager
   labels:
     secret-access/openbao: enabled
+    networking.athanor.local/attached-gateway: "external"

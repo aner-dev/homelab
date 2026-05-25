@@ -10,8 +10,8 @@ metadata:
 spec:
   gatewayClassName: traefik-external
   listeners:
-    - name: http-redirect
-      protocol: HTTP
+    - name: https
+      protocol: HTTPS
       port: 80
       # Traefik handles the redirect logic via a middleware or route rule
       allowedRoutes:
@@ -19,7 +19,7 @@ spec:
           from: Selector
           selector:
             matchLabels:
-              networking.athanor.local/external-gateway-access: "true"
+              networking.athanor.local/attached-gateway: "external"
     - name: https
       protocol: HTTPS
       port: 443
