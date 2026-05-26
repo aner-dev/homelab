@@ -6,3 +6,7 @@ resources:
   - ocirepository.yaml
   - helmrelease.yaml
   - clusterissuer.yaml
+
+labels:
+  - app.kubernetes.io.name: "cert-manager"
+  - networking.athanor.local/attached-gateway: "internal"

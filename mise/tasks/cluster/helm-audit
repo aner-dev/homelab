@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#MISE description="Fetch and dump upstream Helm chart default values for security auditing"
+#MISE alias="audit"
+#MISE tools={ helm="latest", yq="latest" }
+
+set -euo pipefail
+
+if [ $# -lt 2 ]; then
+  echo "Usage: mise run audit <repo_url> <chart_name> [version]"
+  echo "Example: mise run audit https://charts.jetstack.io cert-manager v1.14.0"
+  exit 1
+fi
+
+REPO_URL="$1"
+CHART_NAME="$2"
+VERSION="${3:-latest}"
+
+echo "--> Adding transient repository context..."
+helm repo add transient-audit-repo "$REPO_URL" >/dev/null
+
+echo "--> Updating repository indexes..."
+helm repo update transient-audit-repo >/dev/null
+
+OUTPUT_FILE="${CHART_NAME}-default-values.yaml"
+
+if [ "$VERSION" = "latest" ]; then
+  echo "--> Fetching latest default values for ${CHART_NAME}..."
+  helm show values "transient-audit-repo/${CHART_NAME}" >"$OUTPUT_FILE"
+else
+  echo "--> Fetching version ${VERSION} default values for ${CHART_NAME}..."
+  helm show values "transient-audit-repo/${CHART_NAME}" --version "$VERSION" >"$OUTPUT_FILE"
+fi
+
+echo "--> Cleaning up transient repository context..."
+helm repo remove transient-audit-repo >/dev/null
+
+echo "✅ Audit payload successfully exported to: ./${OUTPUT_FILE}"

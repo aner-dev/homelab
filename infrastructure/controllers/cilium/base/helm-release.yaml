@@ -13,6 +13,7 @@ spec:
         kind: HelmRepository
         name: cilium
         namespace: flux-system
+
   install:
     createNamespace: false
     remediation:

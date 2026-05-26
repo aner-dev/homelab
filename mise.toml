@@ -45,12 +45,8 @@ VAULT_ADDR = "http://vault.vault.svc.cluster.local:8200"
 
 TF_VAR_openbao_addr = "http://localhost:8200"
 
-
-# tasks config 
+# tasks config
 [task_config]
-# This allows mise to find tasks even if I'm deep inside a subdirectory
-includes = [".mise/tasks/**/*.sh", ".mise/tasks/**/run"]
-# Ensures that even if I'm in /infrastructure/apps, 'mise run cluster:sync' works
 dir = "{{config_root}}"
 
 [tasks.tldrb]

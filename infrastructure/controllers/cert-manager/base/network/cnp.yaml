@@ -1,0 +1,22 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: cert-manager-ingress-gateway
+  namespace: cert-manager
+spec:
+  # Layer 1 (Macro): Target all execution endpoints running inside the cert-manager namespace
+  endpointSelector: {}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            # Layer 2 (Micro): Enforce the strict logical AND combination rule
+            "k8s:io.kubernetes.pod.namespace": "traefik"
+            "app.kubernetes.io/name": "traefik"
+      toPorts:
+        - ports:
+            # Allow standard HTTP traffic for ACME HTTP-01 challenge solvers
+            - port: "8089"
+              protocol: TCP
+            # Allow Traefik to communicate with the cert-manager webhook if necessary
+            - port: "10250"
+              protocol: TCP
