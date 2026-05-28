@@ -1,51 +1,61 @@
-# Athanor Cluster: Label & Metadata Taxonomy (v2.0)
+# Athanor Cluster: Label & Metadata Taxonomy (v2.1)
 
-## 1. Identity Layer (Native Kustomize)
-*Defined in: `<APP>/base/kustomization.yaml`*
-*Purpose: Persistent "Who am I?" labels used for Selectors and Services.*
+## 1. Identity Layer (Native Kustomize Engine)
+*Defined in: `apps/<APP>/base/kustomization.yaml`* *Purpose: Persistent "Who am I?" labels used for core service discovery, tracking, and local workload selectors.*
 
 | Key | Example | Logic |
 | :--- | :--- | :--- |
-| `app.kubernetes.io/name` | `linkding` | The primary identifier for the stack. |
-| `app.kubernetes.io/component` | `database` | Distinguishes tiers (web, db, redis). |
-| `app.kubernetes.io/part-of` | `athanor-core` | Groups apps into larger functional suites. |
+| `app.kubernetes.io/name` | `linkding` | The primary identifier for the application stack. |
+| `app.kubernetes.io/component` | `database` | Distinguishes application architectural tiers (`web`, `db`, `redis`). |
+| `app.kubernetes.io/part-of` | `athanor-core` | Groups individual applications into larger logical suites. |
+| `athanor.io/role` | `app` | Functional system categorization (`gateway`, `app`, `operator`, `exporter`). |
 
 ---
 
-## 2. Governance Layer (Flux Kustomization API)
-*Defined in: `infrastructure/<APP>.yaml` (kind: Kustomization)*
-*Purpose: "Where am I?" labels applied at the cluster level for all app resources.*
+## 2. Governance Layer (Flux Kustomization Orchestrator)
+*Defined in: `infrastructure/<APP>.yaml` or `apps/<APP>-sync.yaml` (kind: Kustomization)* *Purpose: "Where am I?" parameters applied dynamically at the cluster root level for policy enforcement and multi-tenancy tracking.*
 
 | Key | Example | Logic |
 | :--- | :--- | :--- |
-| `athanor.io/environment` | `production` | Separates prod/staging logic. |
-| `athanor.io/owner` | `aner` | Identifies the person/team responsible. |
-| `athanor.io/criticality` | `tier-1` | Used for alert routing and priority. |
-| `app.kubernetes.io/managed-by` | `flux` | Global indicator of the GitOps controller. |
+| `athanor.io/environment` | `production` | Isolates environments (`production`, `staging`, `lab`). |
+| `athanor.io/owner` | `aner` | Engineering accountability attribute. |
+| `athanor.io/criticality` | `tier-1` | Controls alert severity escalation pathways and priority routing. |
+| `app.kubernetes.io/managed-by` | `flux` | In-cluster identification for the automated pruning engine. |
 
 ---
 
-## 3. Functional/Granular Layer (Individual Manifests)
-*Defined in: `database.yaml`, `ingress.yaml`, etc.*
-*Purpose: Specific triggers for Cilium, Longhorn, or external controllers.*
+## 3. Functional & Capability Layer (Individual Manifests)
+*Defined in: `namespace.yaml`, `database.yaml`, `http-route.yaml`, etc.* *Purpose: Strict operational selectors that trigger eBPF security states, storage hooks, or monitoring engines.*
 
-| Key | Example | Logic |
+### A. Networking & Ingress (Cilium & Traefik)
+| Key | Example Values | Strategic Purpose |
 | :--- | :--- | :--- |
-| `athanor.io/network-zone` | `internal` | Used by Cilium Network Policies. |
-| `athanor.io/backup-policy` | `daily` | Triggers Longhorn/CNPG backup schedules. |
-|**`athanor.io/scrape`**|`true`|**Metrics:** Global trigger for `VMAgent` scrape.|
-|**`athanor.io/log-format`**|`json`|**Logs:** Instruction for `Loki` parsing.|
-|**`grafana_dashboard`**|`1`|**Dashboards:** Sidecar trigger for JSON import.|
-|**`athanor.io/scrape-port`**|`9090`|**Metrics:** Tells VM exactly which port to hit if it's non-standard.|
-|**`athanor.io/telemetry-path`**|`/metrics`|**Metrics:** If an app uses a non-standard path (like `/stats`).|
-|**`athanor.io/network-zone`**|`observability`|**Networking:** Identifies monitoring components in Cilium.|
+| `athanor.io/network-zone` | `ingress`, `apps`, `observability`, `secure` | Enforces your global zero-trust eBPF perimeter firewalls via Cilium. |
+| `athanor.io/gateway-scope` | `public`, `private` | Mediates explicit Gateway API route attachment boundaries inside Traefik. |
+
+### B. Storage & Lifecycle (Longhorn & CNPG)
+| Key | Example Values | Strategic Purpose |
+| :--- | :--- | :--- |
+| `athanor.io/backup-policy` | `daily`, `weekly`, `disabled` | Hooks directly into backup automation storage crons. |
+
+### C. Telemetry & Observability (VictoriaMetrics & Grafana Stack)
+| Key | Example Values | Strategic Purpose |
+| :--- | :--- | :--- |
+| `athanor.io/scrape` | `"true"`, `"false"` | Global target discoverability indicator for `VMAgent`. |
+| `athanor.io/scrape-port` | `"9090"` | Overrides target port definitions for non-standard exporters. |
+| `athanor.io/telemetry-path` | `"/stats"` | Instructs `VMAgent` to seek alternative endpoint targets. |
+| `athanor.io/log-format` | `"json"`, `"text"` | Instructs `Loki` parsing pipelines on processing formats. |
+| `athanor.io/log-retention` | `"14d"` | Implements custom TTL overrides for intensive logging endpoints. |
+| `grafana_dashboard` | `"1"` | Intercepted by Grafana sidecars to auto-provision JSON configmaps. |
+
+---
 
 # 4. Implementation Examples
-## A. Snippet Configuration (Neovim/JSON)
-- Use these snippets to automate the "Identity vs. Governance" split.
-  - Notice how the Identity labels are baked into the Kustomize Native engine, while Governance is enforced by the Flux Orchestrator.
 
-```JSON
+## A. Snippet Configuration (Neovim/JSON)
+Keep these in your local snippet manager to automate the generation of these patterns flawlessly.
+
+```json
 {
   "Flux Kustomization (Orchestrator)": {
     "prefix": "fks",
@@ -53,13 +63,13 @@
       "apiVersion: kustomize.toolkit.fluxcd.io/v1",
       "kind: Kustomization",
       "metadata:",
-      "  name: ${1:app-name}",
+      "  name: ${1:app-name}-sync",
       "  namespace: flux-system",
       "spec:",
       "  targetNamespace: ${2:app-namespace}",
       "  interval: 1h",
       "  retryInterval: 2m",
-      "  path: ${3:./apps/app-name/production}",
+      "  path: ./apps/${1:app-name}/production",
       "  prune: true",
       "  wait: true",
       "  sourceRef:",
@@ -67,9 +77,9 @@
       "    name: flux-system",
       "  commonMetadata:",
       "    labels:",
-      "      athanor.io/environment: ${4|production,staging,lab|}",
+      "      athanor.io/environment: ${3|production,staging,lab|}",
       "      athanor.io/owner: aner",
-      "      athanor.io/criticality: ${5|tier-1,tier-2,tier-0|}",
+      "      athanor.io/criticality: ${4|tier-1,tier-2,tier-0|}",
       "      app.kubernetes.io/managed-by: flux"
     ],
     "description": "FluxCD Kustomization for Cluster Governance"
@@ -80,63 +90,18 @@
       "apiVersion: kustomize.config.k8s.io/v1beta1",
       "kind: Kustomization",
       "resources:",
-      "  - ${1:base.yaml}",
+      "  - namespace.yaml",
+      "  - helm-repository.yaml",
+      "  - helm-release.yaml",
+      "  - ./networking",
+      "  - ./security",
+      "  - ./storage",
+      "  - ./observability",
       "commonLabels:",
-      "  app.kubernetes.io/name: ${2:app-name}",
-      "  app.kubernetes.io/part-of: athanor-core"
+      "  app.kubernetes.io/name: ${1:app-name}",
+      "  app.kubernetes.io/part-of: athanor-${2:core}",
+      "  athanor.io/role: app"
     ],
-    "description": "Native Kustomize for Application Identity"
+    "description": "Native Kustomize Engine base configuration for domain-driven app structure"
   }
 }
-```
-## B. Case Study: Linkding Deployment (YAML)
-This example demonstrates the Hybrid Metadata Approach in action for the Linkding stack.
-
-```yaml
-# 1. ORCHESTRATOR: infrastructure/linkding.yaml
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: linkding
-  namespace: flux-system
-spec:
-  path: "./apps/linkding/production"
-  targetNamespace: linkding
-  commonMetadata:
-    labels:
-      athanor.io/environment: production   # Governance
-      athanor.io/owner: aner               # Governance
-      athanor.io/criticality: tier-1       # Governance
-      app.kubernetes.io/managed-by: flux   # Governance
-
----
-# 2. ENGINE: apps/linkding/base/kustomization.yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - database.yaml
-  - helm-release.yaml
-commonLabels:
-  app.kubernetes.io/name: linkding         # Identity
-  app.kubernetes.io/part-of: athanor-core  # Identity
-
----
-# 3. GRANULAR: apps/linkding/base/database.yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  name: linkding-db
-spec:
-  inheritedMetadata:
-    labels:
-      app.kubernetes.io/component: database # Specific Component
-      athanor.io/network-zone: internal     # Functional (Cilium)
-      athanor.io/backup-policy: daily       # Functional (CNPG)
-```
-
-# observability layer labels 
-|**Key**|**Example**|**Logic**|
-|---|---|---|
-|`athanor.io/log-retention`|`14d`|**Logs:** Overrides default TTL for specific high-volume apps.|
-|`grafana_dashboard`|`1`|**Dashboards:** Sidecar trigger to import JSON from ConfigMaps.|
-

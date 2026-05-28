@@ -13,7 +13,7 @@ spec:
         - health
 
   egress:
-    # 1. Core Infrastructure (L3/L4)
+    # 1. Core Infrastructure includes the local host API server endpoint for K3s (L3/L4)
     - toEntities: [host, remote-node, health]
 
     # 2. Internal K8s DNS (service discovery)

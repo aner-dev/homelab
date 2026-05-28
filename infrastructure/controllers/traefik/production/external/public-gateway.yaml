@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: external-gateway
+  name: public-gateway
   namespace: traefik
   labels:
     # Standardized Taxonomy
     networking.athanor.local/role: gateway
-    networking.athanor.local/zone: external
+    networking.athanor.local/zone: public
 spec:
-  gatewayClassName: traefik-external
+  gatewayClassName: traefik-public
   listeners:
     - name: https
       protocol: HTTPS
@@ -19,7 +19,7 @@ spec:
           from: Selector
           selector:
             matchLabels:
-              networking.athanor.local/attached-gateway: "external"
+              athanor.io/gateway-scope: "public"
     - name: https
       protocol: HTTPS
       port: 443
@@ -33,4 +33,4 @@ spec:
           from: Selector
           selector:
             matchLabels:
-              networking.athanor.local/external-gateway-access: "true"
+              athanor.io/gateway-scope: "public"

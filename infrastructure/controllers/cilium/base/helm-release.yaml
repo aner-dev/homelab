@@ -37,7 +37,7 @@ spec:
       operator:
         clusterPoolIPv4PodCIDRList: ["10.42.0.0/16"]
     routingMode: native
-    autoDirectNodeRoutes: true
+    autoDirectNodeRoutes: true # make all the nodes of the cluster network of pods and its CIDRs
     ipv4NativeRoutingCIDR: "192.168.100.239/24"
 
     # --- L2 & Gateway API (The New Foundation) ---

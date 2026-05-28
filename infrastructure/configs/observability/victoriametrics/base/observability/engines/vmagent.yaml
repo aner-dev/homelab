@@ -10,7 +10,7 @@ spec:
   # TARGETS (Label Selectors)
   nodeScrapeSelector:
     matchLabels:
-      athanor.io/managed-by: vmagent
+      metrics.athanor.io/scraped-by: vmagent
   serviceScrapeSelector:
     matchLabels:
       metrics.athanor.local/agent: vmagent

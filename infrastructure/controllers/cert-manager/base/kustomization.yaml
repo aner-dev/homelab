@@ -9,4 +9,4 @@ resources:
 
 labels:
   - app.kubernetes.io.name: "cert-manager"
-  - networking.athanor.local/attached-gateway: "internal"
+  - athanor.io/gateway-scope: "internal"

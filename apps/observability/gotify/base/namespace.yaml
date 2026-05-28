@@ -1,0 +1,14 @@
+# apps/observability/gotify/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gotify
+  labels:
+    # 1. Security Controls (Mandatory Admission Engine)
+    pod-security.kubernetes.io/enforce: "restricted"
+    pod-security.kubernetes.io/enforce-version: "latest"
+    pod-security.kubernetes.io/warn: "restricted"
+    pod-security.kubernetes.io/warn-version: "latest"
+    # 2. Capability Selectors (Unlocks your ClusterSecretStore)
+    secret-access/openbao: "enabled"
+    athanor.io/network-zone: "apps"

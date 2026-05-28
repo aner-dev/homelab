@@ -1,0 +1,13 @@
+# apps/gotify/base/observability/vm-service-scrape.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: gotify-metrics
+  namespace: gotify
+spec:
+  selector:
+    matchLabels:
+      metrics.athanor.io/scraped-by: vmagent
+  endpoints:
+    - port: http
+      path: /metrics

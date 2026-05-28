@@ -1,0 +1,12 @@
+# apps/observability/gotify/base/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yaml
+  - service.yaml
+  - security/external-secret.yaml
+
+# 5. Identity Labels applied natively to connect Pods to Services automatically
+commonLabels:
+  app.kubernetes.io/name: gotify
+  app.kubernetes.io/part-of: athanor-observability

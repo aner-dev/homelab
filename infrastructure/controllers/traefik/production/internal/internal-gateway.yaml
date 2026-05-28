@@ -17,8 +17,6 @@ spec:
           from: Selector
           selector:
             matchLabels:
-              # Refactored: Intent-based value
-              networking.athanor.local/attached-gateway: "internal"
     - name: websecure
       protocol: HTTPS
       port: 443
@@ -27,7 +25,7 @@ spec:
           from: Selector
           selector:
             matchLabels:
-              networking.athanor.local/internal-gateway-access: "true"
+              athanor.io/gateway-scope: "internal"
 
       tls:
         mode: Terminate

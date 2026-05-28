@@ -1,0 +1,32 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: cert-manager-alerts
+  namespace: cert-manager
+  labels:
+    role: alert-rules
+    # Ensure this label matches the ruleSelector configured in your central VMAlert instance
+    monitoring: central-vmalert
+spec:
+  groups:
+    - name: cert-manager.rules
+      rules:
+        - alert: CertManagerCertExpirySoon
+          expr: certmanager_certificate_expiration_timestamp_seconds - time() < 604800
+          for: 1h
+          labels:
+            severity: warning
+            cluster: athanor
+          annotations:
+            summary: "Certificate expiring soon for {{ $labels.name }}"
+            description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} will expire in less than 7 days."
+
+        - alert: CertManagerCertificateNotReady
+          expr: certmanager_certificate_ready_status{status!="True"} == 1
+          for: 15m
+          labels:
+            severity: critical
+            cluster: athanor
+          annotations:
+            summary: "Certificate {{ $labels.name }} is not ready"
+            description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} has been in a non-ready state for more than 15 minutes."

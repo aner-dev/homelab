@@ -4,14 +4,18 @@ metadata:
   name: cert-manager-ingress-gateway
   namespace: cert-manager
 spec:
-  # Layer 1 (Macro): Target all execution endpoints running inside the cert-manager namespace
+  # Target all execution endpoints running inside the cert-manager namespace
   endpointSelector: {}
+
+  # --- INGRESS ---
   ingress:
     - fromEndpoints:
         - matchLabels:
-            # Layer 2 (Micro): Enforce the strict logical AND combination rule
-            "k8s:io.kubernetes.pod.namespace": "traefik"
-            "app.kubernetes.io/name": "traefik"
+            # Enforce the strict logical AND combination rule
+            # 1. System Scope: Tells Cilium to look into the 'traefik' namespace
+            k8s:io.kubernetes.pod.namespace: "traefik"
+            # 2. Zone Control: Limits access strictly to pods inside your ingress zone
+            athanor.io/network-zone: "ingress"
       toPorts:
         - ports:
             # Allow standard HTTP traffic for ACME HTTP-01 challenge solvers
@@ -19,4 +23,14 @@ spec:
               protocol: TCP
             # Allow Traefik to communicate with the cert-manager webhook if necessary
             - port: "10250"
+              protocol: TCP
+
+  # --- EGRESS ---
+  egress:
+    # 1. External Public Internet (To contact Let's Encrypt / ZeroSSL ACME APIs)
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
               protocol: TCP
