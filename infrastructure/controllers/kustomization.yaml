@@ -1,12 +1,27 @@
-# infrastructure/controllers/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
 resources:
+  # --- Network & Data Plane Routing (CNI & Ingress Controller) ---
   - cilium/production
-  - longhorn/production
+  - traefik/production
+
+  # --- Storage & Provisioning ---
   - local-path/production
-  - external-secrets/production
+  - longhorn/production
+
+  # --- Security & Secrets ---
   - cert-manager/production
   - eso/production
+
+  # --- Managed Database Platforms ---
   - cloudnative-pg/production
-  - traefik/production
+
+  # --- Observability, Telemetry & Maintenance Foundations ---
+  - victoriametrics/production
+  - node-exporter/ # Flat layout (No production overlay subfolder)
+  - velero/production
+
+  # --- Multi-tenant Ecosystem Extension ---
+  - headscale-operator/ # Flat layout (No production overlay subfolder)
+  - rustfs/production

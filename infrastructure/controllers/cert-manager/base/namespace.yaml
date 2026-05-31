@@ -3,5 +3,5 @@ kind: Namespace
 metadata:
   name: cert-manager
   labels:
-    secret-access/openbao: enabled
+    secret.athanor.io/openbao: enabled
     athanor.io/gateway-scope: "external"

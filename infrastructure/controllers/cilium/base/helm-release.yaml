@@ -28,8 +28,7 @@ spec:
     # --- Policy Logic  ---
     kubeProxyReplacement: true
     policyDenyResponse: "icmp" # communication feedback loop logic
-    policy-deny-response: "none"
-    enable-policy: "default"
+    enablePolicy: "default"
 
     # --- IPAM / Networking ---
     ipam:
@@ -38,11 +37,13 @@ spec:
         clusterPoolIPv4PodCIDRList: ["10.42.0.0/16"]
     routingMode: native
     autoDirectNodeRoutes: true # make all the nodes of the cluster network of pods and its CIDRs
-    ipv4NativeRoutingCIDR: "192.168.100.239/24"
+    ipv4NativeRoutingCIDR: "10.42.0.0/16"
 
     # --- L2 & Gateway API (The New Foundation) ---
     gatewayAPI:
       enabled: true
+      enableAlpn: true # Essential optimization for HTTP/2 & gRPC routing
+
     l2announcements:
       enabled: true
     devices: "eth0"
@@ -54,7 +55,7 @@ spec:
     # `k8sClientRateLimit` controls how many requests the Cilium Agent
     # is allowed to make to the Kubernetes API Server per second.
 
-    # --- Operator Config ---
+    # --- Cilium Operator Config ---
     operator:
       replicas: 1
 
@@ -63,9 +64,15 @@ spec:
       preallocateMaps: true
 
     # --- Service Mesh ---
-    l7Proxy: true # Envoy proxy
+    l7Proxy: true
 
-    # Observability (Hubble)
+    # Envoy proxy
+    envoy:
+      enabled: true
+      log:
+        format: "[%Y-%m-%d %T.%e][%t][%l][%n] [%g:%#] %v"
+
+    # Hubble (Observability)
     hubble:
       enabled: true
       relay:

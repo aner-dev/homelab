@@ -35,8 +35,8 @@ spec:
   values:
     deployment:
       podLabels:
-        networking.athanor.local/role: gateway
-        networking.athanor.local/zone: internal # Adjust for your external instance
+        athanor.io/role: gateway
+        athanor.io/network-zone: internal # Adjust for your external instance
     service:
       enabled: true
       type: LoadBalancer

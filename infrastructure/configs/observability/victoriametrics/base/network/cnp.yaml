@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: allow-vmagent-to-db
+  name: egress-vmagent-to-db
   namespace: observability
 spec:
   endpointSelector:

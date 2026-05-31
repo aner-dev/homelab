@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: linkding-allow-ingress
+  name: ingress-linkding-from-traefik
   namespace: linkding
 spec:
   description: "App-specific networking isolation and mTLS enforcement for linkding"
@@ -14,13 +14,13 @@ spec:
         - matchLabels:
             athanor.io/gateway-zone: internal
       toPorts:
-        - ports: [{port: "9090", protocol: TCP}]
+        - ports: [{ port: "9090", protocol: TCP }]
     # 2. Allow VictoriaMetrics (Scraping Traffic)
     - fromEndpoints:
         - matchLabels:
             athanor.io/network-zone: observability
       toPorts:
-        - ports: [{port: "9090", protocol: TCP}]
+        - ports: [{ port: "9090", protocol: TCP }]
 
   egress:
     # 1. Allow Database access

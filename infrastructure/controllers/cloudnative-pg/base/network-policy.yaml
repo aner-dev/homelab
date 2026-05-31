@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: cnpg-controller-policy
+  name: ingress-cnpg-from-apps
   namespace: cloudnative-pg
 spec:
   description: "Allow CNPG operator to manage clusters and expose metrics."

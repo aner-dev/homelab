@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: traefik-controller-policy
+  name: ingress-traefik-from-external
   namespace: traefik
 spec:
   description: "Allow Traefik to route traffic, talk to API, and expose dashboard."

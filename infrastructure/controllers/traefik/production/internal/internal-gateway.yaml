@@ -4,8 +4,8 @@ metadata:
   name: internal-gateway
   namespace: traefik
   labels:
-    networking.athanor.local/role: gateway
-    networking.athanor.local/zone: internal
+    athanor.io/role: gateway
+    athanor.io/network-zone: internal
 spec:
   gatewayClassName: traefik-internal
   listeners:

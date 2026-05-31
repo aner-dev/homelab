@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: localpath-internal-policy
+  name: ingress-localpath-internal
   namespace: localpath
 spec:
   endpointSelector: {} # Applies to all pods in the namespace

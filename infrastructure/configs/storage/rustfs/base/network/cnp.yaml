@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: rustfs-allow-rules
+  name: ingress-rustfs-internal
   namespace: rustfs
 spec:
   description: "App-specific isolation for rustfs"

@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: longhorn-internal-policy
+  name: ingress-longhorn-internal
   namespace: longhorn
 spec:
   endpointSelector:

@@ -5,8 +5,8 @@ metadata:
   namespace: traefik
   labels:
     # Standardized Taxonomy
-    networking.athanor.local/role: gateway
-    networking.athanor.local/zone: public
+    athanor.io/role: gateway
+    athanor.io/network-zone: public
 spec:
   gatewayClassName: traefik-public
   listeners:

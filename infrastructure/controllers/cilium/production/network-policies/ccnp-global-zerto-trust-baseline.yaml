@@ -29,7 +29,7 @@ spec:
     # 3. External DNS / Blocky (external resolution)
     - toEndpoints:
         - matchLabels:
-            networking.athanor.local/role: dns
+            athanor.io/role: dns
       toPorts:
         - ports:
             - port: "53"

@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: cert-manager-ingress-gateway
+  name: ingress-certmanager-from-traefik
   namespace: cert-manager
 spec:
   # Target all execution endpoints running inside the cert-manager namespace

@@ -4,9 +4,9 @@ kind: Namespace
 metadata:
   name: linkding
   labels:
-    # This is the "Key" that matches the Gateway's 'allowedRoutes' selector
-    networking.athanor.local/internal-gateway-access: "true"
-    # This is the "Identity" used by the Linkding CNP for pod-to-pod security
-    athanor.io/gateway-zone: internal
-    # openbao secret access
-    secret-access/openbao: "enabled"
+    # managed by traefik's internal Gateway
+    athanor.io/gateway-scope: "internal"
+    # openbao vault secret access
+    secret.athanor.io/openbao: "enabled"
+    # pod security standards (PSS) labels
+    pod-security.kubernetes.io/enforce: restricted

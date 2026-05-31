@@ -20,3 +20,4 @@ age.agekey
 .env
 .kubeconfig
 mise.local.toml
+/temp
