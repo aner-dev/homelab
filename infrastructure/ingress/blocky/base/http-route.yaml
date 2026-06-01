@@ -10,7 +10,7 @@ metadata:
 spec:
   parentRefs:
     - name: internal-gateway
-      namespace: traefik
+      namespace: kube-system
   hostnames:
     - "blocky.athanor.io"
   rules:

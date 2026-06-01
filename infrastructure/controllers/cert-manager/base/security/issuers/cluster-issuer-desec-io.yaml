@@ -30,6 +30,6 @@ spec:
           gatewayHTTPRoute:
             parentRefs:
               - name: external-gateway
-                namespace: traefik
+                namespace: kube-system
                 kind: Gateway
             serviceType: ClusterIP

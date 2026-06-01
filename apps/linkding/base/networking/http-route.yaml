@@ -6,7 +6,7 @@ metadata:
 spec:
   parentRefs:
     - name: internal-gateway
-      namespace: traefik
+      namespace: kube-system
   hostnames:
     - "linkding.athanor.local"
   rules:

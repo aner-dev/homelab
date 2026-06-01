@@ -27,6 +27,7 @@ spec:
       enabled: false
     # --- Policy Logic  ---
     kubeProxyReplacement: true
+    policyEnforcementMode: "default" # temporal, "always" mode is the ideal state
     policyDenyResponse: "icmp" # communication feedback loop logic
     enablePolicy: "default"
 

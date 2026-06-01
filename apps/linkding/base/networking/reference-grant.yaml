@@ -8,7 +8,7 @@ spec:
   from: # The SOURCE (Who is sending the traffic?)
     - group: gateway.networking.k8s.io
       kind: Gateway
-      namespace: traefik
+      namespace: kube-system
   to: # The TARGET (Where is it going?)
     - group: ""
       kind: Service

@@ -1,13 +1,12 @@
-apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal-gateway
-  namespace: traefik
+  namespace: kube-system
   labels:
     athanor.io/role: gateway
     athanor.io/network-zone: internal
 spec:
-  gatewayClassName: traefik-internal
+  gatewayClassName: cilium
   listeners:
     - name: http
       protocol: HTTP
@@ -17,6 +16,7 @@ spec:
           from: Selector
           selector:
             matchLabels:
+              athanor.io/gateway-scope: "internal"
     - name: websecure
       protocol: HTTPS
       port: 443
