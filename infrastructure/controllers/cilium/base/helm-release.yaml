@@ -25,6 +25,13 @@ spec:
     # --- CRDs management (avoid installing them) ---
     crd:
       enabled: false
+    # --- Security Relevant Labels ---
+    # Signalling the eBPF agent which prefixes to use for identity hashing.
+    labels:
+      - "k8s:io.kubernetes.pod.namespace"
+      - "k8s:app.kubernetes.io/name"
+      - "k8s:athanor.io"
+
     # --- Policy Logic  ---
     kubeProxyReplacement: true
     policyEnforcementMode: "default" # temporal, "always" mode is the ideal state
