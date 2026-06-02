@@ -1,4 +1,4 @@
-apiVersion: "cilium.io/v2alpha1"
+apiVersion: "cilium.io/v2"
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: "home-lan-lb-pool"
@@ -9,4 +9,4 @@ spec:
   serviceSelector:
     matchLabels:
       # Only Services with this label can get an IP from this pool
-      io.cilium/ipam-pool: "lan-expose"
+      athanor.io/l2-announced: "true"

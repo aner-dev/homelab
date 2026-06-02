@@ -7,10 +7,10 @@ spec:
   loadBalancerIPs: true
   externalIPs: true
   interfaces:
-    - ^eth0$ # this should matches the 'ip addr' cli-command output
+    - ^eth0$ # logical princple: this should matches the 'ip addr' cli-command output
   nodeSelector:
     matchLabels:
       kubernetes.io/os: linux
   serviceSelector:
     matchLabels:
-      io.cilium/l2-announced: "true"
+      athanor.io/ipam-pool: "lan-expose"
