@@ -68,6 +68,7 @@ spec:
 
     l2announcements:
       enabled: true
+    # network device mapping (L2 requirement)
     devices: "eth0"
 
     # --- Performance Tuning ---
