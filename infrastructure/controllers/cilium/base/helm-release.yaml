@@ -33,6 +33,12 @@ spec:
     crd:
       enabled: false
 
+    # --- Load Balancer Class ---
+    loadBalancer:
+      enabled: true
+      # This tells Cilium to assume control of Services with this class
+      # If you leave it empty, it defaults to managing all services.
+      # I think that declaring it explicitly is safer for GitOps though.
     # --- Security Relevant Labels ---
     # Signalling the eBPF agent which prefixes to use for identity hashing.
     labels:
