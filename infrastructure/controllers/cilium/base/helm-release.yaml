@@ -22,6 +22,10 @@ spec:
     remediation:
       retries: 3
   values:
+    # --- Cluster name ---
+    cluster:
+      name: athanor
+      id: 1 # Unique ID for multi-cluster routing
     # --- CRDs management (avoid installing them) ---
     crd:
       enabled: false
