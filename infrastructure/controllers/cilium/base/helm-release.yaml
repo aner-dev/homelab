@@ -4,6 +4,7 @@ metadata:
   name: cilium
   namespace: cilium
 spec:
+  # --- Helm Chart Spec ---
   interval: 1h
   chart:
     spec:
