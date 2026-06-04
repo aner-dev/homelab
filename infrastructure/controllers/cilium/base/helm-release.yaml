@@ -36,12 +36,15 @@ spec:
     # --- Load Balancer Class ---
     loadBalancer:
       enabled: true
-      # This tells Cilium to assume control of Services with this class
-      # If you leave it empty, it defaults to managing all services.
+      # tells Cilium to assume control of LoadBalancer type Services
+      # when leaved empty, it defaults to managing all LB services.
       # I think that declaring it explicitly is safer for GitOps though.
+
     # --- Security Relevant Labels ---
     # Signalling the eBPF agent which prefixes to use for identity hashing.
-    labels: "k8s:io.kubernetes.pod.namespace k8s:app.kubernetes.io/name k8s:athanor.io"
+    # Inclusive whitelist: Only these prefixes are used for identity hashing.
+    # Periods must be escaped (\\.) to match literal domain dots in regex.
+    labels: "io\\.kubernetes\\.pod\\.namespace app\\.kubernetes\\.io/name athanor\\.io"
 
     # --- Policy Logic  ---
     kubeProxyReplacement: true
