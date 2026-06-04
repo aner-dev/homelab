@@ -41,10 +41,7 @@ spec:
       # I think that declaring it explicitly is safer for GitOps though.
     # --- Security Relevant Labels ---
     # Signalling the eBPF agent which prefixes to use for identity hashing.
-    labels:
-      - "k8s:io.kubernetes.pod.namespace"
-      - "k8s:app.kubernetes.io/name"
-      - "k8s:athanor.io"
+    labels: "k8s:io.kubernetes.pod.namespace k8s:app.kubernetes.io/name k8s:athanor.io"
 
     # --- Policy Logic  ---
     kubeProxyReplacement: true
