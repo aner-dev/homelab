@@ -5,7 +5,8 @@ metadata:
   namespace: cilium
 spec:
   loadBalancerIPs: true
-  externalIPs: true
+  externalIPs: false
+
   interfaces:
     - ^eth0$ # logical princple: this should matches the 'ip addr' cli-command output
   nodeSelector:
@@ -14,3 +15,4 @@ spec:
   serviceSelector:
     matchLabels:
       athanor.io/ipam-pool: "lan-expose"
+      athanor.io/l2-announced: "true"

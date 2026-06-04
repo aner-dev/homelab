@@ -6,6 +6,7 @@ metadata:
   labels:
     athanor.io/role: gateway
     athanor.io/network-zone: internal
+    #NOTE: add the ip-pool/l2 label to this gateway (ingress controller)
 spec:
   gatewayClassName: cilium
   listeners:

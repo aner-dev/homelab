@@ -54,37 +54,49 @@ spec:
 
     # --- IPAM / Networking ---
     ipam:
-      mode: "cluster-pool"
+      mode: "cluster-pool" # default kubernetes host-scope mode but controlled by cilium
       operator:
         clusterPoolIPv4PodCIDRList: ["10.42.0.0/16"]
     routingMode: native
     autoDirectNodeRoutes: true # make all the nodes of the cluster network of pods and its CIDRs
     ipv4NativeRoutingCIDR: "10.42.0.0/16"
 
-    # --- L2 & Gateway API (The New Foundation) ---
+    # --- Gateway API  ---
     gatewayAPI:
       enabled: true
       enableAlpn: true # Essential optimization for HTTP/2 & gRPC routing
 
+    # --- L2 announcements ---
     l2announcements:
       enabled: true
-    # network device mapping (L2 requirement)
-    devices: "eth0"
+
+    # Network Device Mapping (L2 requirement)
+    devices: "eth0" # This guarantees Cilium binds native eBPF hooks directly onto eth0.
 
     # --- Performance Tuning ---
     k8sClientRateLimit:
-      qps: 20 # queries per second
+      qps: 20 # queries (requests) per second done by the cilium agent to the K8s API server
       burst: 40 # Burst: maximum number of requests allowed in a sudden spike
-    # `k8sClientRateLimit` controls how many requests the Cilium Agent
-    # is allowed to make to the Kubernetes API Server per second.
 
     # --- Cilium Operator Config ---
     operator:
       replicas: 1
 
-    # --- eBPF Config ---
+    # --- eBPF Config (datapath rules) ---
     bpf:
       preallocateMaps: true
+      masquerade: true # Tells Cilium HOW to masquerade (using native eBPF)
+
+    # --- Global Masquerade Switch ---
+    enableIPv4Masquerade: true # Tells Cilium WHAT to masquerade (turns on IPv4 SNAT globally)
+
+    # --- Fragment Handling & Torrent Optimizations ---
+    # Self-documenting flags protecting high-concurrency UDP workloads (Arr Stack/DHT)
+    fragmentTracking: true # <-- Global root variable to lock in tracing
+
+    # Optional: Setting extra daemon configurations explicitly as a top-level block helper
+    extraConfig:
+      bpf-fragments-map-max: "8192" # <-- Protects heavy P2P/DHT scaling overhead
 
     # --- Service Mesh ---
     l7Proxy: true
