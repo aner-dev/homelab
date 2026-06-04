@@ -40,7 +40,7 @@ upstreams:
       - privacy
 
     # The Rest of the Cluster (The "Worker" CIDR)
-    10.42.0.0/24:
+    10.42.0.0/16:
       - velocity
 
     velocity:
