@@ -33,6 +33,9 @@ spec:
     crd:
       enabled: false
 
+    debug:
+      enabled: false # switch to "true" in debugging workflows.
+
     # --- Load Balancer Class ---
     loadBalancer:
       enabled: true
