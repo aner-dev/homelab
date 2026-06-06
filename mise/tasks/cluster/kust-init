@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# purpose: Automatically discover nested subdirectories and scaffold missing kustomization files
+
+set -euo pipefail
+
+# Find directories inside base that don't have a kustomization file and initialize them
+find infrastructure/controllers -type d \( -name "network" -o -name "security" -o -name "storage" -o -name "observability" \) | while read -r dir; do
+  if [ ! -f "$dir/kustomization.yaml" ]; then
+    echo "⚙️  Scaffolding boilerplate for: $dir"
+    cat <<EOF >"$dir/kustomization.yaml"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+EOF
+    # Automatically append both standard and SOPS-encrypted files to the resources array
+    find "$dir" -maxdepth 1 \( -name "*.yaml" -o -name "*.enc.yaml" \) ! -name "kustomization.yaml" -exec basename {} \; | while read -r file; do
+      echo "  - $file" >>"$dir/kustomization.yaml"
+    done
+  fi
+done
