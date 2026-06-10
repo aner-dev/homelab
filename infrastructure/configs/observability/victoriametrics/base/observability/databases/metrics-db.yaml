@@ -19,7 +19,7 @@ spec:
     resources:
       requests:
         storage: 20Gi
-    storageClassName: longhorn
+    storageClassName: local-path
 
   extraArgs:
     snapshotAuthKey: "your-secret-key-here"

@@ -48,7 +48,7 @@ spec:
   statefulStorage:
     volumeClaimTemplate:
       spec:
-        storageClassName: "longhorn"
+        storageClassName: "local-path"
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
