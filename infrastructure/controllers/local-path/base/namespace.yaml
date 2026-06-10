@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: local-path
+  labels:
+    # --- 1. Governance Metadata Labels ---
+    athanor.io/environment: "production"
+    athanor.io/criticality: "tier 1"
+    athanor.io/owner: "aner"
+    app.kubernetes.io/managed-by: "flux"
+    # --- 2. Architectural Micro/Macro Perimeter ---
+    athanor.io/network-zone: "infra"
+    # --- 3. Pod Security Standards Admission (PSS) ---
+    pod-security.kubernetes.io/enforce: "privileged" # Necessary for local-path
+    pod-security.kubernetes.io/enforce-version: "latest"
+    pod-security.kubernetes.io/warn: "privileged" # Necessary for local-path
+    pod-security.kubernetes.io/warn-version: "latest"
+  annotations:
+    athanor.io/docs-reference: "check -> homelab/docs/label-taxonomy.md for architectural principles"
