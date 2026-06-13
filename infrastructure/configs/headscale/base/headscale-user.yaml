@@ -1,0 +1,11 @@
+apiVersion: headscale.infrado.cloud/v1alpha1
+kind: HeadscaleUser
+metadata:
+  name: platform-owner
+  namespace: headscale-system
+spec:
+  headscaleRef:
+  username: "anerleon" # The sole human owner namespace of the athanor mesh network
+  displayName: "aner"
+  email: "aner@athanor.internal" # fictional internal dummy domain address
+

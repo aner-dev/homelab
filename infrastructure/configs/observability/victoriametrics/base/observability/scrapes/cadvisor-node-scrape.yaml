@@ -1,0 +1,27 @@
+# infrastructure/configs/observability/cadvisor-scrape.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMNodeScrape
+metadata:
+  name: cadvisor-metrics
+  namespace: observability
+  labels:
+    app.kubernetes.io/managed-by: "vmagent"
+spec:
+  # The Kubelet usually listens on 10250 with HTTPS
+  scheme: "https"
+  tlsConfig:
+    caFile: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+    insecureSkipVerify: true # Necessary if the Node IP doesn't match the Cert SAN
+  bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+  path: /metrics/cadvisor
+  port: "10250"
+  interval: 30s
+  selector:
+    matchLabels:
+      kubernetes.io/os: linux
+  relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_node_name]
+      targetLabel: instance
+      action: replace
+    - targetLabel: job
+      replacement: cadvisor

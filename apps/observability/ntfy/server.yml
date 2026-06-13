@@ -1,0 +1,2 @@
+base-url: https://ntfy.athanor.io
+listen-http: ":80"

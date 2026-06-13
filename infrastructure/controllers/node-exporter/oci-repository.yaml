@@ -1,0 +1,11 @@
+# infrastructure/controllers/node-exporter/oci-repository.yaml
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: prometheus-node-exporter
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: oci://ghcr.io/prometheus-community/charts/prometheus-node-exporter
+  ref:
+    tag: 4.42.0

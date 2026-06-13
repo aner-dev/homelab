@@ -1,0 +1,25 @@
+# infrastructure/configs/observability/victoriametrics/vmalertmanager.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanager
+metadata:
+  name: athanor-alertmanager
+  namespace: observability
+spec:
+  replicaCount: 1
+  selectAllByDefault: true # aggregate all `VMAlertmanagerConfig`s automatically
+
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+
+  resources:
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"

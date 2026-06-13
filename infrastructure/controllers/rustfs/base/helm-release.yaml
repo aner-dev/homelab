@@ -1,0 +1,113 @@
+#NOTE: check 'podAffinity:' option and theory (k8s documentation topic)
+#NOTE: 'kms:' could be over-engineering to athanor <- [ ] research "encryption at rest" as concept
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rustfs
+  namespace: storage
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: rustfs
+      version: ">=1.0.0-alpha.0" # version pinning pending ? 
+      sourceRef:
+        kind: HelmRepository
+        name: rustfs
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    # --- Mode Selection ---
+    mode:
+      standalone:
+        enabled: true
+      distributed:
+        enabled: false
+
+    image:
+      rustfs:
+        tag: "1.0.0-alpha.5" #NOTE: PENDING: Replace with the actual stable version
+
+    # PROBE TUNING: Accounting for EC startup time
+    livenessProbe:
+      initialDelaySeconds: 60
+    readinessProbe:
+      initialDelaySeconds: 20
+
+    # MAINTENANCE SAFETY: Prevent accidental eviction
+    pdb:
+      create: true
+      maxUnavailable: 1
+
+    # CLEAN ENVIRONMENT: Disable legacy K8s feature
+    enableServiceLinks: false
+
+    config:
+      rustfs:
+        volumes: "/data" # Standard persistence path
+        region: "homelab-brazil" # Essential for S3/SDK compatibility
+        log_level: "info"
+        log_rotation:
+          # Prevent log storage from filling up Longhorn
+          size: 100
+          keep_files: 5
+        ec:
+          storage_class_standard: "EC:4" # data recovery strategy (based on parity)
+        scanner:
+          speed: "default"
+        # OBSERVABILITY: Day 0 readiness for OTLP
+        obs_endpoint:
+          enabled: false # Set to true once deployed an Otel Collector
+          base_endpoint: "http://otel-collector.monitoring:4318"
+    secret:
+      existingSecret: "rustfs-credentials" # references the external-secret.yaml
+
+    # --- NETWORKING: Gateway API & Traefik Stickiness ---
+    gatewayApi:
+      enabled: true
+      gatewayClass: traefik
+      hostname: s3.athanor.home
+    ingress:
+      enabled: false # I'll declare a `kind: HTTPRoute` manifest for it
+
+    service:
+      traefikAnnotations:
+        traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+        traefik.ingress.kubernetes.io/service.sticky.cookie.name: "rustfs_session"
+
+    # --- SECURITY: Hardening the Container ---
+    podSecurityContext:
+      fsGroup: 10001
+      runAsUser: 10001
+      runAsGroup: 10001
+
+    containerSecurityContext:
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+
+    # --- Persistence & Resources ---
+    storageclass:
+      name: "longhorn"
+      dataStorageSize: "100Gi"
+      logStorageSize: "1Gi"
+
+    replicaCount: 1
+
+    # Recommended Resource Limits for a 32GB RAM host
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+      requests:
+        cpu: "200m"
+        memory: "512Mi"

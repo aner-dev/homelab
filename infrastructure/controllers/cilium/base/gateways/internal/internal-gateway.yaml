@@ -1,0 +1,35 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal-gateway
+  namespace: kube-system
+  labels:
+    athanor.io/role: gateway
+    athanor.io/network-zone: internal
+    #NOTE: add the ip-pool/l2 label to this gateway (ingress controller)
+spec:
+  gatewayClassName: cilium
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              athanor.io/gateway-scope: "internal"
+    - name: websecure
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              athanor.io/gateway-scope: "internal"
+
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: athanor-wildcard-cert

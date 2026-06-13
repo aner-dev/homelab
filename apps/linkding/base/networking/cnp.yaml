@@ -1,0 +1,42 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: ingress-linkding-from-traefik
+  namespace: linkding
+spec:
+  description: "App-specific networking isolation and mTLS enforcement for linkding"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: linkding
+  ingress:
+    # 1. Allow the Gateway (User Traffic)
+    - fromEndpoints:
+        - matchLabels:
+            athanor.io/gateway-zone: internal
+      toPorts:
+        - ports: [{ port: "9090", protocol: TCP }]
+    # 2. Allow VictoriaMetrics (Scraping Traffic)
+    - fromEndpoints:
+        - matchLabels:
+            athanor.io/network-zone: observability
+      toPorts:
+        - ports: [{ port: "9090", protocol: TCP }]
+
+  egress:
+    # 1. Allow Database access
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: linkding-db
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # 2. Allow Inbound Web Scraping (DNS is inherited from CCNP automatically)
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

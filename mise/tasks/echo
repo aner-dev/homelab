@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="build the cli"
+echo "hello there from $MISE_PROJECT_ROOT"

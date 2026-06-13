@@ -1,0 +1,55 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: blocky
+  namespace: dns-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: blocky
+      version: "11.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-home-lab
+        namespace: flux-system
+  values:
+    controller:
+      replicas: 1
+
+      service:
+      main: # The 'bjw-s' library usually calls the primary service 'main'
+        enabled: true
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: "192.168.1.195"
+        ports:
+          dns-udp:
+            enabled: true
+            port: 53
+            protocol: UDP
+          dns-tcp:
+            enabled: true
+            port: 53
+            protocol: TCP
+          http:
+            enabled: true
+            port: 4000
+      persistence:
+        # This name (certs) is the identifier for the volume
+        certs:
+          enabled: true
+          type: secret
+          name: blocky-tls-secret # Matches the secretName in your Certificate manifest
+          mountPath: /etc/blocky/certs
+          readOnly: true
+
+      # Ensure the config file is also mounted correctly
+      # Usually provided via ConfigMap or Secret
+      config:
+        enabled: true
+        type: configMap
+        name: blocky-config
+        mountPath: /etc/blocky/config.yaml
+        subPath: config.yaml
+        readOnly: true

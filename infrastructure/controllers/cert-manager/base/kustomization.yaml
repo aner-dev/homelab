@@ -2,7 +2,17 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  # Local Controller Bootstrap Files
   - namespace.yaml
   - ocirepository.yaml
-  - helmrelease.yaml
-  - clusterissuer.yaml
+  - helm-release.yaml
+
+  # Functional Architectural Subdirectories
+  - network
+  - security
+  # - storage       <-- Uncomment these as soon as you add a kustomization.yaml inside them
+  # - observability
+
+labels:
+  - app.kubernetes.io.name: "cert-manager"
+  - athanor.io/gateway-scope: "internal"

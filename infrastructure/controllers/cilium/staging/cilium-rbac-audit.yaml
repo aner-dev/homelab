@@ -14,8 +14,6 @@ rules:
   resources:
   - networkpolicies
   verbs:
---
-  verbs:
   - patch
 ---
 # Source: cilium/templates/cilium-operator/clusterrole.yaml

@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vm-backup-athanor
+  namespace: observability
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: vmbackup
+              image: victoriametrics/vmbackup:v1.139.0
+              env:
+                # 1. Auth key for the snapshot API
+                - name: SNAPSHOT_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: vm-auth-credentials
+                      key: VM_SNAPSHOT_AUTH_KEY
+                # 2. S3 Credentials for RustFS
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: vm-auth-credentials
+                      key: S3_ACCESS_KEY
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: vm-auth-credentials
+                      key: S3_SECRET_KEY
+              args:
+                # The ?secret= parameter is required when snapshotAuthKey is set on the server
+                - -snapshot.createURL=http://athanor-metrics-db.observability.svc.cluster.local:8429/snapshot/create?secret=$(SNAPSHOT_KEY)
+                - -dst=s3://backups/athanor-metrics
+                - -s3.endpoint=http://rustfs-service.rustfs-namespace.svc.cluster.local:9000
+                - -s3.forcePathStyle=true
+          restartPolicy: OnFailure

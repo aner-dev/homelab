@@ -1,0 +1,2 @@
+- Is it "tricky"? Yes, primarily because you move from a simple, stateless protocol (UDP) to a stateful, encrypted one that requires Certificate Management and Handshake Overhead.
+- In most homelabs, we let the Internal Network stay on plain UDP for speed and "simplicity," but we configure Blocky to use DoT/DoH for its External upstreams (to deSEC/Quad9). This gives you privacy on the internet without the latency tax inside your house.

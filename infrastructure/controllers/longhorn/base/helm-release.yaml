@@ -1,0 +1,73 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+spec:
+  dependsOn:
+    - name: longhorn-crds
+      namespace: flux-system
+  releaseName: longhorn
+  interval: 1h
+  driftDetection:
+    mode: enabled
+  install:
+    createNamespace: false
+    crds: Skip
+  upgrade:
+    crds: Skip
+  chart:
+    spec:
+      chart: longhorn
+      version: "1.11.0"
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+        namespace: flux-system
+  values:
+    # 1. Top-level key: Controls Managers, UI, Drivers (The "Brain") `priorityClass:`
+    kubeletRootDirectory: /var/lib/rancher/k3s/agent/kubelet
+    priorityClass: infra-foundation
+    allowCollectingLonghornUsageMetrics: false
+    installCRDs: false
+    defaultSettings:
+      # --- Scheduling & Single-Node Optimization ---
+      defaultReplicaCount: 1
+      replicaSoftAntiAffinity: true
+      replicaAutoBalance: "least-effort" # Ensures that if I add a node later, it doesn't cause a 'rebuild storm'
+      allowScalingReplica0: true # Allows volumes to scale to 0 when not in use
+
+      # --- Storage & Pathing ---
+      defaultDataPath: /var/lib/longhorn
+      storageMinimalAvailablePercentage: 10
+      storageReservedPercentageForDefaultDisk: 15 # Protects your /home partition
+      storageOverProvisioningPercentage: 200
+      nfsExportOptions: "rw,no_root_squash,no_subtree_check"
+      # --- Maintenance & Reliability ---
+      priorityClass: infra-foundation
+      concurrentAutomaticEngineUpgradePerNodeLimit: 1
+      nodeDrainPolicy: block-if-contains-last-replica
+      orphanReplicaDirectoryCheckInterval: 1440 # Check once a day (saves CPU)
+      autoSalvage: true
+      # --- Database Optimization ---
+      # Keeps data close to the PG Pod for lower latency
+      defaultDataLocality: "best-effort"
+
+      # --- Snapshot & Backup Management ---
+
+      # Automatically cleans up old system snapshots to save space on your 810GB drive
+      snapshotDataIntegrity: "fast-check"
+      autoCleanupSystemGeneratedSnapshot: true
+
+      # --- Backup Target (Future Garage S3 storage Deployment) ---
+      backupTarget: "s3://linkding-backups@garage.internal:9000/" # Your Garage URL
+      backupTargetCredentialSecret: "garage-s3-auth" # Matches the target.name above
+      # If using a self-signed cert for Garage:
+      # backupTargetCertConfigMap: "garage-ca-cert"
+    persistence:
+      defaultClass: true
+      reclaimPolicy: Retain # Protects data if I delete a PVC by mistake
+    metrics:
+      enabled: true

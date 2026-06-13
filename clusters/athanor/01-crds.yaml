@@ -1,0 +1,47 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: layer-01-crds
+  namespace: flux-system
+spec:
+  interval: 15m
+  retryInterval: 2m
+  prune: true
+  wait: true
+  force: false
+  timeout: 3m
+  path: ./infrastructure/crds
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+
+  commonMetadata:
+    labels:
+      app.kubernetes.io/part-of: platform-foundation
+      app.kubernetes.io/component: api-schemas
+      app.kubernetes.io/managed-by: flux
+    annotations:
+      athanor.io/owner: "aner"
+      athanor.io/description: "base custom resource definitions for controllers & operators"
+
+  healthChecks:
+    # Cilium
+    - apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      name: ciliumnetworkpolicies.cilium.io
+    # Cert-Manager
+    - apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      name: certificates.cert-manager.io
+    # Longhorn
+    - apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      name: volumes.longhorn.io
+    # External Secrets
+    - apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      name: externalsecrets.external-secrets.io
+    # Gateway API
+    - apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      name: gateways.gateway.networking.k8s.io

@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
   name: blocky # placeholder
   labels:
-    secret-access/vault: true # ClusterSecretStore key
+    athanor.io/openbao-access: "enabled" # ClusterSecretStore key
     # Infrastructure Tiers: they're excelent for "Group By" logic in monitoring dashboards (grafana)
     tier: infrastructure
     component: dns
@@ -17,4 +17,4 @@ metadata:
   annotations:
     # Documentation & Ownership
     home.lab/owner: "aner"
-    home.lab/description: "Primary DNS resolution for the homelab"
+    home.lab/description: "Primary DNS resolution for the athanor"

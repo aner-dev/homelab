@@ -1,0 +1,72 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  name: vmagent
+  namespace: observability
+commonMetadata:
+  labels:
+    athanor.io/network-zone: observability
+spec:
+  # TARGETS (Label Selectors)
+  nodeScrapeSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: vmagent
+  serviceScrapeSelector:
+    matchLabels:
+      athanor.io/scrape: "true"
+  podScrapeSelector:
+    matchLabels:
+      athanor.io/scrape: "true"
+
+  disableAutomountServiceAccountToken: true
+
+  # SIGNATURE: Added to every metric automatically
+  externalLabels:
+    # it says "all this metrics (data) is coming from the athanor cluster"
+    cluster: athanor
+    datacenter: homelab
+
+  # --- SCRAPE BEHAVIOR ---
+  # Global interval to prevent "over-scraping"
+  scrapeInterval: 30s
+  # These are added to the 'args' of the vmagent container by the operator
+  extraArgs:
+    promscrape.dropOriginalLabels: "true" # Saves RAM in K8s environments
+    # memory.allowedBytes is handled automatically by the 'resources' limits below
+    reloadAuthKey: "athanor-secret-key-123"
+
+  # DESTINATION
+  remoteWrite:
+    # this 'feds' the `metrics-db` declared on the `VMSingle` manifest
+    - url: "http://vmsingle-athanor-metrics-db.observability.svc:8428/api/v1/write" # k8s service discovery
+      send_labels: true
+      maxSamplesPerSend: 10000
+      queues: 2
+
+  # STORAGE
+  # BUFFERING temporal storage (connection looses events)
+  statefulStorage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: "longhorn"
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi # Small buffer is enough for homelab
+
+  # VERSIONING
+  image:
+    repository: victoriametrics/vmagent
+    tag: v1.139.0
+
+  # RESOURCE MANAGEMENT (GOMAXPROCS Logic) <- see vm docs
+  resources:
+    limits:
+      cpu: "1" # Integer value helps Go runtime thread management
+      memory: "512Mi"
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+
+  # 1 agent instance should be enough for a single-node homelab
+  replicaCount: 1 # N agents-per-N nodes logic

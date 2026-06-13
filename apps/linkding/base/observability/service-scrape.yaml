@@ -1,0 +1,37 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: linkding-scrape
+  namespace: apps
+  labels:
+    athanor.io/scrape: "true"
+spec:
+  selector:
+    # This tells VM: "Look for the Endpoints object associated with this Service"
+    matchLabels:
+      app: linkding
+  endpoints:
+    - port: http # This is the name of the port in the Service spec
+      path: /metrics
+      interval: 30s
+      # --- SERVICE DISCOVERY RELABELING ---
+      relabelConfigs:
+        # 1. ENFORCE THE JOB NAME:
+        - targetLabel: job
+          replacement: linkding
+          action: replace
+
+        - sourceLabels: [__meta_kubernetes_pod_name] # By default, 'instance' is often 'IP:Port' (e.g., 10.42.0.15:9100).
+          targetLabel: instance
+          action: replace
+
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: kubernetes_namespace
+          action: replace
+
+      # --- STAGE 2: METRIC RELABELING ---
+      metricRelabelConfigs:
+        # Drop high-cardinality Go/Prometheus internal metrics
+        - sourceLabels: [__name__]
+          regex: "^(go_|promhttp_).*"
+          action: drop

@@ -1,0 +1,29 @@
+# "helm show values" equivalent for local-path config.json
+configData:
+  # 1. Node Path Mapping Structure
+  # Defines where data lands on specific bare-metal or VM hosts.
+  nodePathMap:
+    - node: "DEFAULT_PATH_FOR_NON_LISTED_NODES"
+      paths:
+        - "/opt/local-path-provisioner" # Fallback absolute path. If multiple paths are listed, choices are random.
+    # Example of a node restriction or exclusion pattern:
+    # - node: "untrusted-or-stateless-node"
+    #   paths: [] # Explicitly refuses to provision storage on this node.
+
+  # 2. Shared Filesystem Support
+  # Allows multi-node mounting (ReadWriteMany / ROX / RWO) if backed by an underlying shared cluster mount (e.g., NFS/Ceph/Gluster).
+  # CRITICAL: Mutually exclusive with nodePathMap. If used, nodePathMap must be set to [].
+  sharedFileSystemPath: "" # e.g., "/mnt/shared-cluster-nfs"
+
+  # 3. Storage Class Specific Routing overrides
+  # Allows you to map separate StorageClasses to distinct nodePathMaps or shared paths inside this single config file.
+  # CRITICAL: Mutually exclusive with the global nodePathMap and sharedFileSystemPath options.
+  storageClassConfigs: {}
+  #  ssd-storage-class:
+  #    nodePathMap: [...]
+
+  # 4. Security & Hardening: Distroless Commands
+  # Bypasses the requirement for raw shell scripts (setup/teardown) inside the ConfigMap.
+  # Allows executing binary files compiled straight into a secure, distroless helper pod image.
+  setupCommand: "" # Path to binary inside helper pod (e.g., "/usr/local/bin/setup-dir")
+  teardownCommand: "" # Path to binary inside helper pod (e.g., "/usr/local/bin/teardown-dir")

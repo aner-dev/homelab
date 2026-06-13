@@ -1,0 +1,35 @@
+# infrastructure/controllers/cert-manager/base/cluster-issuer-desec-io.yaml
+# THE EXTERNAL DOOR (ACME/Let's Encrypt)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: desec-cluster-issuer-letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: n0amh4w8@anonaddy.me
+    privateKeySecretRef:
+      name: letsencrypt-desec-account-key
+    solvers:
+      - selectors:
+          matchLabels:
+            use-dns01-solver: "true"
+        dns01:
+          webhook:
+            groupName: acme.desec.io
+            solverName: desec
+            config:
+              apiTokenSecretRef:
+                name: desec-api-token
+                key: api-token
+      # FALLBACK/GENERIC: HTTP-01 for everything else
+      - selectors:
+          matchLabels:
+            use-http01-solver: "true"
+        http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: external-gateway
+                namespace: kube-system
+                kind: Gateway
+            serviceType: ClusterIP

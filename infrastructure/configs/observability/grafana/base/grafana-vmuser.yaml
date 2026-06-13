@@ -1,0 +1,20 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMUser
+metadata:
+  name: grafana-reader
+  namespace: observability
+  labels:
+    project: athanor # Matches the selector in VMAuth
+spec:
+  tokenRef:
+    name: grafana-auth-token # The name of the Secret created by ESO
+    key: token # The key inside that secret
+  bearerToken: "secret-token-here"
+  targetRefs:
+    - crd:
+        kind: VMSingle
+        name: athanor-metrics-db # The 'metadata.name' of the VMSingle
+        namespace: observability
+      paths:
+        - "/api/v1/query"
+        - "/api/v1/query_range"

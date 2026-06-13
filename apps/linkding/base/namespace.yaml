@@ -1,0 +1,12 @@
+# linkding/base/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: linkding
+  labels:
+    # managed by traefik's internal Gateway
+    athanor.io/gateway-scope: "internal"
+    # openbao vault secret access
+    athanor.io/openbao-access: "enabled"
+    # pod security standards (PSS) labels
+    pod-security.kubernetes.io/enforce: restricted

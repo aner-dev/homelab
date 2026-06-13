@@ -1,0 +1,35 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: platform-critical
+value: 1000000000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+description: "Core cluster controllers and infrastructure components (Cilium, Local-Path, FluxCD, Longhorn) that must never be evicted."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: tenant-stateful
+value: 500000000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+description: "Stateful tenant applications holding databases or source code storage matrices (CloudNative-PG, Forgejo)."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: tenant-stateless
+value: 100000000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+description: "Standard stateless tenant applications that can handle rolling restarts during resource constraints (Linkding, Wallabag)."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: tenant-ephemeral
+value: 10000000
+preemptionPolicy: Never
+globalDefault: false
+description: "Volatile or non-critical analytical app workloads. If cluster resources are exhausted, these pods will patiently wait in the scheduling queue."

@@ -1,0 +1,22 @@
+# infrastructure/configs/observability/node-scrape.yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMNodeScrape
+metadata:
+  name: node-exporter
+  namespace: observability
+  labels:
+    athanor.io/scrape: "true"
+spec:
+  # This tells VMAgent to find nodes that are "Ready"
+  selector:
+    matchLabels:
+      kubernetes.io/os: linux
+  path: /metrics
+  port: "9100" # defined in HelmRelease
+  interval: 30s
+  relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_node_name]
+      targetLabel: instance
+      action: replace
+    - targetLabel: job
+      replacement: node-exporter

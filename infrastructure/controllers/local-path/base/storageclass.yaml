@@ -1,0 +1,9 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path
+provisioner: rancher.io/local-path
+parameters:
+  nodeAffinityKey: kubernetes.io/hostname
+volumeBindingMode: WaitForFirstConsumer # wait until a 'consumer pod' is created
+reclaimPolicy: Delete

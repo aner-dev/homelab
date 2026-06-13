@@ -12,6 +12,6 @@ resources:
 labels:
   - pairs:
       app.kubernetes.io/name: adguard-home
-      app.kubernetes.io/part-of: homelab-infrastructure
+      app.kubernetes.io/part-of: athanor-infrastructure
       env: base
     includeSelectors: true # This mimics the old 'commonLabels' behavior

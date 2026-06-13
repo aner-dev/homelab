@@ -3,9 +3,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - cert-manager/sync.yaml
-  - cilium/sync.yaml
-  - cloudnative-pg/sync.yaml
-  - gateway/sync.yaml
-  - external-secrets/sync.yaml
-  - longhorn/sync.yaml
+  - cert-manager
+  - cilium
+  - cloudnative-pg
+  - external-secrets
+  - gateway
+  - longhorn
+  - victoriametrics

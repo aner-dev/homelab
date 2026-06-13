@@ -1,0 +1,12 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "home-lan-lb-pool"
+  namespace: cilium
+spec:
+  blocks:
+    - cidr: "192.168.1.192/29" # 8 IPs: .192 through .199
+  serviceSelector:
+    matchLabels:
+      # Only Services with this label can get an IP from this pool
+      athanor.io/l2-announced: "true"

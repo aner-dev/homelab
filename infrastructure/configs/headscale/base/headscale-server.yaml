@@ -1,0 +1,45 @@
+apiVersion: headscale.infrado.cloud/v1beta1
+kind: Headscale
+metadata:
+  name: headscale-sample
+  namespace: headscale
+spec:
+  version: "v0.28.0"
+  replicas: 1
+  persistent_volume_claim:
+    access_modes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+    storage_class_name: longhorn
+
+  config:
+    # SWAP: Move from http/.local to your secure public deSEC endpoint
+    server_url: https://vpn.yourdomain.dedyn.io
+    listen_addr: 0.0.0.0:8080
+    grpc_listen_addr: 0.0.0.0:50443
+    grpc_allow_insecure: true # Safe: Traefik handles the edge TLS boundary
+
+    disable_check_updates: false
+    database:
+      type: sqlite
+    # ENABLE: Turn on internal overlays and relay networks
+    derp:
+      server:
+        enabled: true
+        region_id: 999
+        region_code: "athanor-relay"
+        region_name: "Internal Homelab Relay"
+        stun_listen_addr: "0.0.0.0:3478"
+
+    dns:
+      magic_dns: true # Vital for node-to-node hostname communication
+      base_domain: internal.yourdomain.dedyn.io
+
+  # Automatic API key management (optional)
+  api_key:
+    auto_manage: true # Automatically create and rotate API keys
+    manager_image: headscale-api-key
+    expiration: "2160h" # API key expires in 90 days (2160 hours)
+    rotation_buffer: "240h" # Rotate 10 days (240 hours) before expiration

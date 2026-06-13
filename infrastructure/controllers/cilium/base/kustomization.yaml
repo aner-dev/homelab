@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - helm-repo.yaml
+  - helm-repository.yaml
   - helm-release.yaml
 
 # This ensures all Cilium resources are labeled for IaC tracking

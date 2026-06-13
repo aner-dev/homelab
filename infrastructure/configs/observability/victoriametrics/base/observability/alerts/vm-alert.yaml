@@ -1,0 +1,17 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlert
+metadata:
+  name: central-vmalert
+  namespace: observability
+spec:
+  # 1. Look into ALL namespaces for VMRule manifests
+  ruleNamespaceSelector: {}
+
+  # 2. But only process VMRules that have this specific label
+  ruleSelector:
+    matchLabels:
+      monitoring: central-vmalert
+
+  # 3. Point VMAlert to your central VictoriaMetrics storage engine
+  datasource:
+    url: "http://vmsingle-observability.observability.svc:8428"

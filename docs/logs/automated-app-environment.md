@@ -99,7 +99,7 @@ resource "kubernetes_manifest" "secret_store" {
     apiVersion = "external-secrets.io/v1beta1"
     kind       = "SecretStore"
     metadata = {
-      name      = "vault-backend"
+      name      = "openbao-store"
       namespace = kubernetes_namespace.this.metadata[0].name
     }
     spec = {

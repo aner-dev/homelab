@@ -1,0 +1,21 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: ingress-longhorn-internal
+  namespace: longhorn
+spec:
+  endpointSelector:
+    matchLabels:
+      # Targets all Longhorn components (manager, driver, etc)
+      app.kubernetes.io/instance: longhorn
+  egress:
+    - toEntities:
+        - kube-apiserver
+        - remote-node # Required for data plane replication between nodes
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": longhorn
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": longhorn

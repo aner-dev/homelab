@@ -1,0 +1,105 @@
+# infrastructure/apps/linkding/base/helm-release.yaml
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: linkding
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: linkding
+      version: "3.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: pascaliske
+        namespace: flux-system
+
+  # Ensure the Database and Secret exist before deploying
+  dependsOn:
+    - name: linkding-db
+    - name: linkding-es
+
+  targetNamespace: linkding
+
+  wait: true
+  healthChecks:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      name: linkding-db
+      namespace: linkding
+
+  values:
+    # 1. Controller Logic (Replicas & Resources)
+    controller:
+      type: deployment
+      replicas: 1
+      # Define how the pod should behave during restarts
+      strategy: RollingUpdate
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: http
+        initialDelaySeconds: 10
+        periodSeconds: 20
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: http
+        initialDelaySeconds: 5
+        periodSeconds: 10
+
+    # 2. Resources Management
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+    # 3. Image (Pinned Version)
+    image:
+      repository: ghcr.io/sissbruecker/linkding
+      pullPolicy: IfNotPresent
+      tag: "1.45.0-plus"
+
+    # 4. Service & Identity (Internal ClusterIP)
+    fullnameOverride: "linkding"
+    service:
+      enabled: true
+      type: "ClusterIP"
+      labels:
+        athanor.io/scrape: "true"
+
+    ports:
+      # This creates the stable SSOT for VMAgent discovery and HTTPRoute backends.
+      http:
+        enabled: true
+        port: 9090
+        protocol: "TCP"
+
+    # 5. Storage Logic
+    persistentVolumeClaim:
+      create: false # Tell the chart NOT to try creating its own PVC
+      existingPersistentVolumeClaim: "linkding-pvc-static" # Link to the manual one
+      name: "linkding-pvc"
+      storageClassName: "longhorn"
+      accessMode: "ReadWriteOnce"
+      size: "1Gi"
+      mountPath: "/etc/linkding/data"
+
+    # 6. Environment & Secrets
+    envFrom:
+      - configMapRef:
+          name: linkding-configmap
+      - secretRef:
+          name: linkding-env-secrets
+    # 7. Labels
+    podLabels: # 1. K8S STANDARDS (Identity)
+
+    app.kubernetes.io/name: linkding
+    app.kubernetes.io/component: app
+    app.kubernetes.io/part-of: athanor-core
+
+    # 2. ATHANOR STANDARDS (Security/Functional)
+    athanor.io/network-zone: internal

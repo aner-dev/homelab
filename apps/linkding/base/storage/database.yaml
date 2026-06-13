@@ -1,0 +1,54 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: linkding-db
+  namespace: linkding
+spec:
+  description: Postgres cluster for linkding application
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.1
+  instances: 1
+  inheritedMetadata:
+    labels:
+      # --- Standard Identity ---
+      app.kubernetes.io/name: linkding
+      app.kubernetes.io/instance: linkding-db
+      app.kubernetes.io/component: database
+      app.kubernetes.io/part-of: athanor-core
+      app.kubernetes.io/managed-by: flux
+
+      # --- Functional / Infrastructure ---
+      athanor.io/network-zone: internal
+      athanor.io/backup-policy: daily
+      athanor.io/db-provider: "true" # The "Key" for the Global Baseline
+
+      # --- Governance ---
+      athanor.io/environment: production
+      athanor.io/criticality: tier-1
+
+  primaryUpdateStrategy: unsupervised
+
+  storage:
+    size: 2gi
+    storageClass: longhorn
+
+  walStorage:
+    size: 1Gi
+    storageClass: longhorn
+
+  bootstrap:
+    initdb:
+      database: linkding
+      owner: linkding
+      secret:
+        name: linkding-db-creds
+
+  monitoring:
+    enablePodMonitor: true
+
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"

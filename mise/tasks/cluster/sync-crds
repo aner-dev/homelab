@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# [MISE] description="Sync CRDs"
+# [MISE] sources=["infrastructure/controllers/**/helm.yaml"]
+# [MISE] outputs=["infrastructure/controllers/**/crds.yaml"]
+
+# Logic goes here...

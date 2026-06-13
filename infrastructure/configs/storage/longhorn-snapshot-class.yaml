@@ -1,0 +1,9 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: longhorn-snapshot-vsc
+driver: driver.longhorn.io
+deletionPolicy: Delete # If you delete the Snapshot object, it deletes the data in Garage
+parameters:
+  # This tells Longhorn to send the snapshot to the S3 Backup Target (Garage)
+  type: bak

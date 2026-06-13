@@ -1,0 +1,7 @@
+# infrastructure/crds/gateway/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Structural Format: github.com/{org}/{repo}/{path/to/subdir}?ref={tag_or_branch}
+  - github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.5.1

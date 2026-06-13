@@ -1,0 +1,28 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: ingress-cnpg-from-apps
+  namespace: cloudnative-pg
+spec:
+  description: "Allow CNPG operator to manage clusters and expose metrics."
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: cloudnative-pg
+  egress:
+    # 1. Talk to K8s API to manage Postgres resources
+    - toEntities:
+        - kube-apiserver
+    # 2. Talk to the pods it manages (The DBs)
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": "*" # Or specific app namespaces
+            app.kubernetes.io/managed-by: cloudnative-pg
+  ingress:
+    # 3. Forthcoming: Allow VictoriaMetrics to scrape metrics
+    - fromEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": monitoring
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

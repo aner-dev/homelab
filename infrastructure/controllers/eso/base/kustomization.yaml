@@ -4,17 +4,3 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - service-account.yaml
-
-helmCharts:
-  - name: external-secrets
-    releaseName: external-secrets
-    version: 0.9.11
-    repo: https://charts.external-secrets.io
-    namespace: external-secrets
-    valuesInline:
-      installCRDs: true
-      serviceAccount:
-        create: false # Don't let Helm create it
-        name: "external-secrets"
-      rbac:
-        create: true

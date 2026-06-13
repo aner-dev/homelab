@@ -8,7 +8,7 @@ resources:
 labels:
   - pairs:
       environment: production
-      secret-access/vault: "true"
+      athanor.io/openbao-access: "enabled"
     includeSelectors: false # Optional: Keeps Kustomize from breaking the existing Deployment selectors
 
 patches:

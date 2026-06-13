@@ -1,0 +1,23 @@
+# apps/dns-system/blocky/base/httproute.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: blocky
+  namespace: dns-system
+  labels:
+    app.kubernetes.io/name: blocky
+    app.kubernetes.io/part-of: athanor-core
+spec:
+  parentRefs:
+    - name: internal-gateway
+      namespace: kube-system
+  hostnames:
+    - "blocky.athanor.io"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: blocky # Matches the Service name generated in the HelmRelease
+          port: 4000 #

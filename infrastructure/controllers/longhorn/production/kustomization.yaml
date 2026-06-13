@@ -3,10 +3,4 @@ kind: Kustomization
 
 resources:
   - ../base
-  - resources/http-route.yaml
-
-patches:
-  - path: patches/ryzen-v2-engine.yaml
-    target:
-      kind: HelmRelease
-      name: longhorn
+  - network/
